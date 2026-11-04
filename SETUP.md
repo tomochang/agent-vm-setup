@@ -144,6 +144,32 @@ gitignored `credentials/` inside `$RECORDS`. Never print a secret value.
 - **Verify**: the human can state back the approval boundaries in one
   sentence each. If they can't, the rules are too long.
 
+## Phase 7 — The working systems (todo, skills, workflows)
+
+1. **Todo.** Copy `todo/` into the records repo's tooling. Create
+   `private/todo.md` (with the state-model header from
+   `todo/README.md`), `private/todo_done.md` and `private/todo_log.md`.
+   Adopt the 3-line format (`todo/todo-format.md`) for new items and
+   run `todo/todo_consistency.py check --base origin/main` before any
+   landing that touches the file. Schedule the two jobs from
+   `todo/job-patterns.md` (~30 min each): inbox sync, then
+   auto-advance.
+2. **Skills.** Create `skills/` in the records repo. Move any
+   procedure longer than a few lines out of the resident file into a
+   `SKILL.md` (see `skills/README.md` for the format and authoring
+   rules) and put the *situation → skill* row for it in the resident
+   file's map. Start with the procedures you already repeat.
+3. **Workflows.** Adopt as needed: watchers
+   (`workflows/watchers.md`) for every chat where a counterpart's
+   reply matters — registered in the health loop's coverage check in
+   the same step; the gates flow (`workflows/gates.md`) for all
+   records landings; the handoff protocol (`workflows/handoff.md`)
+   if a second machine does heavy work; the improvement loop
+   (`workflows/improvement-loop.md`) once the rest is stable.
+- **Verify**: add a todo item, watch one sync cycle classify an
+  inbox message into it, and land one change of each kind (a todo
+  flip, a doc) through the gates.
+
 ## Done
 
 Report to the human: what is up, what you verified (with the actual
