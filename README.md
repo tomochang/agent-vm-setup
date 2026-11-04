@@ -67,6 +67,7 @@ end: never bounce a completable setup step back to the human.
 
 ```
 SETUP.md          the runbook a Muse executes (start here)
+OPERATOR.md       who the author is, and the approval envelope for author-guided support
 beeper/           launch script (headless X + a11y), OAuth setup, liveness
 health/           failure ledger + health-loop templates
 healthchecks/     dead man's switch pattern (ping wiring + judge)
