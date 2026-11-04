@@ -65,7 +65,7 @@ pgrep -x openbox >/dev/null || (openbox >/dev/null 2>&1 &)
 sleep 1
 
 # Beeper itself: if it is already up, leave it alone
-if pgrep -f 'squashfs-root/beepertexts' >/dev/null; then
+if pgrep -f '[b]eepertexts' >/dev/null; then
   echo "launch-beeper: already running; bus/WM/a11y ensured, leaving it up"
   exit 0
 fi

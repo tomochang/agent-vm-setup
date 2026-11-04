@@ -14,12 +14,18 @@ if [ -f "$CREDS" ]; then
   [ -n "$PING_URL" ] && curl -fsS --max-time 30 "$PING_URL" >/dev/null 2>&1 || true
 fi
 
-# 1. check; if red, bootstrap once and recheck
+# 1. check; if red, bootstrap once and recheck (silent when green,
+# including green-after-bootstrap: the silence contract is the point)
 OUT="$("$HERE/bootstrap-check.sh" 2>&1)" && { exit 0; }
 bash "$HERE/vm-bootstrap.sh" >/dev/null 2>&1 || true
-OUT2="$("$HERE/bootstrap-check.sh" 2>&1)" && { echo "health: recovered after bootstrap"; exit 0; }
+OUT2="$("$HERE/bootstrap-check.sh" 2>&1)" && { exit 0; }
 
-# 2. still red: surface the failing lines only
+# 2. still red: record each failure in the ledger (signature = the
+# check's name before the colon), then surface the failing lines
+echo "$OUT2" | grep '^FAIL' | while IFS= read -r line; do
+  sig="$(printf '%s' "$line" | sed 's/^FAIL *//; s/:.*//; s/[^a-zA-Z0-9]/-/g' | tr 'A-Z' 'a-z')"
+  [ -n "$sig" ] && python3 "$HERE/failure_ledger.py" add "health-$sig" "$line" >/dev/null 2>&1 || true
+done
 echo "health: FAILING after bootstrap"
 echo "$OUT2" | grep -E '^(FAIL|WARN)' || echo "$OUT2"
 exit 1

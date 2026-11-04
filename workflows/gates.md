@@ -19,6 +19,15 @@ a new procedure doc, a tool fix — lands the same way:
    against the exact tree being landed.
 5. **Clean up.** Pull the main clone, remove the worktree and branch.
 
+The gate script itself is yours to write — deliberately a pattern,
+not a shipped binary, because the checks differ per repo. It is a
+thin wrapper (tens of lines) that must guarantee exactly three
+things: the checks for the change's class run against the rebased
+tree (not the author's older checkout), the merge to main happens
+only when they pass, and the run leaves a record (a log line or a PR
+check) that a later reader can audit. Everything else about it is
+taste.
+
 ## Why this shape
 
 - **Conflicts surface before they land**, on the branch, not on the

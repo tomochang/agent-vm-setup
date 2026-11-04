@@ -12,10 +12,14 @@ RECORDS="${RECORDS:-$HOME/records}"   # your records repo (SETUP Phase 1)
 # --- tools (prefer $HOME installs: /usr and /root may be wiped) ---
 if command -v claude >/dev/null 2>&1 || [ -x "$HOME/.npm-global/bin/claude" ]; then ok "claude: present"; else bad "claude: MISSING (run vm-bootstrap)"; fi
 if command -v codex >/dev/null 2>&1; then ok "codex: present"; else bad "codex: MISSING"; fi
-if command -v gh >/dev/null 2>&1; then ok "gh: present"; else bad "gh: MISSING"; fi
+# gh is OPTIONAL (SETUP Phase 1 allows a deploy-key-only setup): warn
+# when absent, fail only when it is installed but its auth is missing.
+if command -v gh >/dev/null 2>&1; then ok "gh: present"; else warn "gh: not installed (optional)"; fi
 
 # --- auth/config that must live in the persistent home ---
-if [ -f "$HOME/.config/gh/hosts.yml" ]; then ok "gh auth file: present"; else bad "gh auth file: MISSING"; fi
+if command -v gh >/dev/null 2>&1; then
+  if [ -f "$HOME/.config/gh/hosts.yml" ]; then ok "gh auth file: present"; else bad "gh auth file: MISSING"; fi
+fi
 if [ -f "$HOME/.ssh/config" ]; then ok "ssh config: present"; else bad "ssh config: MISSING"; fi
 
 # --- Beeper: process up AND Desktop API answering with the stored token ---

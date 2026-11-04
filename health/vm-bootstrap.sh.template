@@ -28,19 +28,22 @@ fi
 # 2. temp dir on the big disk if /tmp is a small tmpfs (adapt size/paths)
 mkdir -p "$H/workspace/big-tmp"
 
-# 3. Beeper relaunch (idempotent launcher leaves a running instance alone)
+# 3. Beeper: a running process is not enough — the API must answer.
+# A hung process is killed (bracket form) and relaunched; after a
+# launch, poll the API (any HTTP status, even 401, means it is up)
+# for up to ~90s — the app starts slower than a process check.
 # Pass BEEPER_PROXY through if your egress needs it — a relaunch from a
 # bare cron environment otherwise loses the proxy the launcher needs.
 # Credential-free CONNECT URL only; a credentialed one goes stale.
-if pgrep -f '[b]eepertexts' >/dev/null 2>&1; then
-  log "beeper: already running"
+api_up() { curl -s -o /dev/null -m 3 http://127.0.0.1:23373/v1/accounts; }
+if pgrep -f '[b]eepertexts' >/dev/null 2>&1 && api_up; then
+  log "beeper: already running, API up"
 elif [ -x "$H/workspace/beeper-diag/launch-beeper.sh" ]; then
-  if BEEPER_PROXY="${BEEPER_PROXY:-}" bash "$H/workspace/beeper-diag/launch-beeper.sh" >/dev/null 2>&1 && sleep 5 && pgrep -f '[b]eepertexts' >/dev/null 2>&1; then
-    log "beeper: relaunched OK"
-  else
-    log "beeper: relaunch FAILED"
-    FAIL=1
-  fi
+  pkill -f '[b]eepertexts' 2>/dev/null; sleep 3
+  BEEPER_PROXY="${BEEPER_PROXY:-}" bash "$H/workspace/beeper-diag/launch-beeper.sh" >/dev/null 2>&1
+  ok=0
+  for _ in $(seq 18); do sleep 5; if api_up; then ok=1; break; fi; done
+  if [ "$ok" = 1 ]; then log "beeper: relaunched OK"; else log "beeper: relaunch FAILED"; FAIL=1; fi
 fi
 
 # 4. locales (optional — only if your tooling depends on a specific one)

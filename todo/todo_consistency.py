@@ -103,6 +103,9 @@ def _item_problems(item, todo_name):
         m = re.search(r'状態\s*[:：]\s*([a-z_]+)', line2)
         if m and m.group(1) not in STATES:
             warnings.append(msg('state-value', f'unknown state {m.group(1)!r}'))
+        if m and m.group(1) == 'done':
+            errors.append(msg('done-state', "state is 'done' in the open todo; "
+                              'move the item to the done file'))
         if not (re.search(r'hard|soft', line2, re.I) or '期限なし' in line2
                 or re.search(r'期限\s*[:：]\s*なし', line2)):
             warnings.append(msg('deadline-kind', 'line 2 has no hard, soft, or 期限なし'))
@@ -150,6 +153,9 @@ def main():
     c.add_argument('--root', type=Path, default=Path('.'))
     c.add_argument('--file', default='private/todo.md')
     c.add_argument('--base', default=None, help='git revision to compare against (incremental mode)')
+    c.add_argument('--done-file', default='private/todo_done.md',
+                   help='finished-items file; an open item whose title also '
+                        'appears there is an error (two state surfaces)')
     args = p.parse_args()
     try:
         path = args.root / args.file
@@ -160,6 +166,17 @@ def main():
                                    capture_output=True)
             base_text = shown.stdout.decode('utf-8') if shown.returncode == 0 else ''
         result = check_file(text, args.file, base_text)
+        done_path = args.root / args.done_file
+        if done_path.exists():
+            done_titles = {_title(l) for l in done_path.read_text(encoding='utf-8').split('\n')
+                           if re.match(r'^- \[[ xX]\]', l)}
+            done_titles.discard(None)
+            open_titles = {_title(l) for l in text.split('\n')
+                           if re.match(r'^- \[ \]', l)}
+            open_titles.discard(None)
+            for t in sorted(open_titles & done_titles):
+                result['errors'].append(f'{args.file}: [duplicate] item also '
+                                        f'present in {args.done_file}: {t[:60]}')
     except (OSError, UnicodeError) as exc:
         result = {'errors': [str(exc)], 'warnings': [], 'checked': 0}
     print(json.dumps(result, ensure_ascii=False, indent=2))

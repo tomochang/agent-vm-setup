@@ -36,4 +36,7 @@ firing.
 7. **Approval boundaries are exact.** Stop and get approval before
    payments, booking confirmations, reservation changes, and messages
    to third parties — the authorized envelope is the instruction, and
-   a confirmation covers only the exact action named.
+   a confirmation covers only the exact action named. Actions already
+   inside an envelope the human approved and recorded (a decided todo
+   item, a standing instruction) proceed without a new stop: the stop
+   is for *new* commitments beyond it, not for executing it.

@@ -61,6 +61,17 @@ def main():
         return emit("alive", 0)
     if state == 'auth':
         return emit("auth", 4)
+    # A hung process defeats the launcher's leave-it-alone rule: if a
+    # beepertexts process exists but the API is down, kill it first
+    # (bracket form, so the pattern cannot match this process).
+    try:
+        if subprocess.run(['pgrep', '-f', '[b]eepertexts'],
+                          capture_output=True).returncode == 0:
+            subprocess.run(['pkill', '-f', '[b]eepertexts'],
+                           capture_output=True)
+            time.sleep(3)
+    except Exception:
+        pass
     # Fire the launcher detached and poll the API: the launcher itself
     # returns once Beeper is started (it backgrounds the app), but its
     # exit alone is not proof the API is up — the poll below is.

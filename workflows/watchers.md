@@ -1,5 +1,10 @@
 # Watchers — replies get noticed by a script, not by luck
 
+A pattern, not a shipped script: the poll/wake mechanics and the
+state it keeps (a fingerprint of the last-seen message per chat,
+plus the coverage registry the health loop checks) are specified
+below; the implementation is a short script per deployment.
+
 The failure this prevents: a counterpart (another agent, an external
 executor) replies in a chat, and nobody notices until the human asks
 "did they answer?" — sometimes days later. It happened three times

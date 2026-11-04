@@ -7,6 +7,9 @@ Usage:
   beeper_api.py search <query>
   beeper_api.py send <chatID> <text...>   (write scope; use only per the caller's rules)
   beeper_api.py send-file <chatID> <path>  (attachment via /v1/assets/upload, then the message)
+Note: `messages` returns ONE page (texts truncated to 500 chars). For
+full-history verification reads, page with --cursor <cursor> until a
+page comes back empty — never conclude absence from the first page.
 Exit 3 + 'AUTH_EXPIRED' on stderr when the token is missing/expired/rejected
 (current token: read+write, non-expiring 'Never', no refresh token — re-run
 oauth_setup.py "read write" to replace it)."""
@@ -106,6 +109,11 @@ def main():
         i = args.index("--limit")
         limit = int(args[i + 1])
         del args[i:i + 2]
+    cursor = None
+    if "--cursor" in args:
+        i = args.index("--cursor")
+        cursor = args[i + 1]
+        del args[i:i + 2]
     cmd = args[0] if args else ""
     if cmd == "chats":
         d = get("/v1/chats", {"limit": limit})
@@ -119,7 +127,10 @@ def main():
                 "preview": pv_text(c)} for c in d.get("items", [])]
         print(json.dumps(out, ensure_ascii=False, indent=1))
     elif cmd == "messages" and len(args) > 1:
-        d = get(f"/v1/chats/{urllib.parse.quote(args[1], safe='')}/messages", {"limit": limit})
+        params = {"limit": limit}
+        if cursor:
+            params["cursor"] = cursor
+        d = get(f"/v1/chats/{urllib.parse.quote(args[1], safe='')}/messages", params)
         out = [{"id": m.get("id"), "sender": m.get("sender") or m.get("senderName"),
                 "ts": m.get("timestamp") or m.get("ts"), "text": (m.get("text") or m.get("body") or "")[:500]}
                for m in d.get("items", [])]

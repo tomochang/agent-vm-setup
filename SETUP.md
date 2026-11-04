@@ -94,18 +94,20 @@ gitignored `credentials/` inside `$RECORDS`. Never print a secret value.
    settings and relaunch.
 3. **[HUMAN]** Sign in — but the human never sees this VM's display:
    Beeper runs on headless Xvfb. You drive the sign-in screen via
-   `beeper/cdp.py`: read the email-code field state and the SAS emoji
-   sequence out of the DOM, relay them to the human over chat, and
-   type the code they give you back. Wait for initial sync to finish.
+   `beeper/cdp.py`, so install its dependency *first*:
+   `python3 -m pip install --target ~/.pylibs websocket-client`
+   (if `python3 -m pip` itself is missing: `apt-get install -y
+   python3-pip`; on PEP 668 systems the `--target` form is the one
+   that works). Then, via `cdp.py`: read the email-code field state
+   and the SAS emoji sequence out of the DOM, relay them to the human
+   over chat, and type the code they give you back. Wait for initial
+   sync to finish.
 4. Issue the Desktop API token with the canonical script:
    `python3 beeper/oauth_setup.py "read write"`. It prints an
    `AUTH_URL` and waits for a redirect to a local callback — open the
    URL **inside the Beeper renderer** via `cdp.py` (assign
    `location.href`); the consent screen renders in the app itself.
-   The clicks are yours (the agent's), driven by `cdp.py` — it needs
-   `websocket-client` where `cdp.py` looks for it:
-   `python3 -m pip install --target ~/.pylibs websocket-client`
-   (on PEP 668 systems that `--target` form is the one that works).
+   The clicks are yours (the agent's), driven by `cdp.py`.
    On the consent screen: check "Allow sensitive actions", and set
    expiry to **Never** — the expiry control is a native `<select>`;
    find the option whose text is "Never", assign that option's value
@@ -137,7 +139,9 @@ gitignored `credentials/` inside `$RECORDS`. Never print a secret value.
    can read (or the human's own, if they prefer). The agent-managed
    route: request the emailed login link, read it from the connected
    mailbox, open it in the browser session, and you are in — no
-   password needs inventing. **[HUMAN]** only if the account already
+   password needs inventing. (This assumes your platform gives you a
+   mailbox you can read and a browser session — givens for the agent
+   platform this package targets.) **[HUMAN]** only if the account already
    belongs to the human and they want to tap anything themselves.
 2. Add a check: cron schedule matching your health loop (e.g.
    `*/30 * * * *`), grace 15 min, email notifications on.
@@ -166,11 +170,16 @@ gitignored `credentials/` inside `$RECORDS`. Never print a secret value.
 3. Schedule a 30-minute job running `health/health-loop.sh.template`
    (adapted): ping (Phase 4) → check → bootstrap once → recheck →
    surface remaining failures to the human, stay silent when all
-   green. The channel it surfaces on is your normal chat with the
-   human — the job's non-empty output is the message.
+   green. Run the loop as the same user that owns the records repo
+   and `$HOME`, and pin HOME/PATH in the job definition rather than
+   relying on sudo's environment. The channel it surfaces on is your
+   normal chat with the human — on an agent platform the job's
+   non-empty output is the message (on plain cron, pipe it to your
+   own notifier; cron mail is not a chat).
 4. Initialize `health/failure_ledger.py` next to its JSONL log; add a
-   30-minute check job that stays silent unless an unresolved repeated
-   failure exists.
+   30-minute check job that runs its `check` and surfaces the output
+   only when it exits non-zero (`ok: false`) — the JSON it prints on
+   success is for the job to consume, not to forward.
 5. Add an auto-pull job (~30 min) for the records repo: `git fetch`
    and `git pull --no-rebase --no-edit` as separate steps; silent
    unless the tree is dirty or a pull conflicts.

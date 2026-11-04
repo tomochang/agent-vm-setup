@@ -4,6 +4,12 @@ Two small scheduled jobs keep the todo honest. Both are *silent
 unless something changed* — a job that reports "nothing happened"
 trains the human to ignore the one that matters.
 
+These are patterns, not shipped scripts: the preflight/watermark
+mechanics (a state file holding the last-seen timestamp or message
+ID per source, compared cheaply before any model wakes) are
+specified by the steps below, and the implementation is a short
+script per deployment.
+
 ## 1. Inbox sync — the sensor (~every 30 min)
 
 Reads the messaging inbox and flips todo states on the events found

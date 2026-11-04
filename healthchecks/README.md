@@ -9,6 +9,8 @@ schedule; a missing ping triggers an email alert.
 1. Free account at healthchecks.io. An agent can complete the whole
    flow itself through the emailed login link (read from the connected
    mailbox, opened in the agent's browser) — no password to invent.
+   (Assumes the agent platform provides a readable mailbox and a
+   browser session.)
 2. Create a check matching your health loop's cadence, e.g.
    period 30 min (`*/30 * * * *`), grace 15 min, email notifications on.
 3. Store secrets in `~/.config/healthchecks/credentials` (mode 600),
