@@ -22,8 +22,8 @@ description: 5エージェントチームのタスク管理・進捗監視・ク
 
 ## リポジトリ範囲の制約（最重要）
 
-- **編集・生成・テストは `research/neobank-ui-design/` 配下のみ**
-- 全タスク送信時に `cd research/neobank-ui-design && pwd && git status` を先頭に含める
+- **編集・生成・テストは `research/example-project/` 配下のみ**
+- 全タスク送信時に `cd research/example-project && pwd && git status` を先頭に含める
 - 範囲外の編集を検知したら即停止して差し戻し
 
 ## ワークフロー
@@ -50,8 +50,8 @@ $HOME/records/scripts/tmux-team.sh status
 空いている実装者に `assign` でタスクを送信。**必ず `pwd && git status` チェックを含める:**
 
 ```bash
-$HOME/records/scripts/tmux-team.sh assign cl1 "cd $HOME/records/research/neobank-ui-design && pwd && git status && <タスク内容>"
-$HOME/records/scripts/tmux-team.sh assign cx1 "cd $HOME/records/research/neobank-ui-design && pwd && git status && <タスク内容>"
+$HOME/records/scripts/tmux-team.sh assign cl1 "cd $HOME/records/research/example-project && pwd && git status && <タスク内容>"
+$HOME/records/scripts/tmux-team.sh assign cx1 "cd $HOME/records/research/example-project && pwd && git status && <タスク内容>"
 ```
 
 ### Step 4: 進捗監視
@@ -80,7 +80,7 @@ $HOME/records/scripts/tmux-team.sh review-route cx1 cl2
 
 全サブタスクのレビューが APPROVE になったら:
 
-- `git diff --stat` で `research/neobank-ui-design/` 配下以外に変更がないことを確認
+- `git diff --stat` で `research/example-project/` 配下以外に変更がないことを確認
 - テスト実行（Unit/Contract + 最短E2E）
 - 変更ファイル一覧とサマリーをユーザーに報告
 - 必要に応じて git commit を指示
@@ -98,4 +98,4 @@ $HOME/records/scripts/tmux-team.sh review-route cx1 cl2
 - `team` tmuxセッションが起動済みであること
 - 5ペイン（mgr, cl1, cl2, cx1, cx2）が存在すること
 - `scripts/tmux-team.sh` が実行可能であること
-- 作業指示書: `research/neobank-ui-design/docs/plans/ai-work-instructions-2026-02-19.md`
+- 作業指示書: `research/example-project/docs/plans/ai-work-instructions.md`

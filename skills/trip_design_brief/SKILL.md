@@ -21,7 +21,7 @@ description: "Frame itinerary options from the generated window brief after a pr
 
 - Treat existing bookings as sunk costs, not rails.
 
-- Read the full procedure in records repo `docs/infra/trip-window-dump-2026-11-04.md` when you need the record behind these steps.
+- Read the full procedure in records repo `docs/infra/trip-window-dump.md` when you need the record behind these steps.
 
 ## Available connectors
 

@@ -19,7 +19,7 @@ description: "Move a calendar event's linked travel blocks with it and verify co
 
 - Run `the setup tools directory/calendar_block.py <eventId>` again after patching and confirm the block runs continuously.
 
-- Read the full procedure in records repo `docs/infra/calendar-block-2026-11-03.md` when you need the record behind these steps.
+- Read the full procedure in records repo `docs/infra/calendar-block.md` when you need the record behind these steps.
 
 ## Available connectors
 

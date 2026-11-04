@@ -25,7 +25,7 @@ description: "Settle a todo entry's outcome against Beeper, Google Calendar and 
 
 - Execute the cleanup in the main chat only after the operator's OK, and land it through the gates.
 
-- Read the full procedure in records repo `docs/infra/improvement-scout-2026-11-03.md` when you need the record behind these steps.
+- Read the full procedure in records repo `docs/infra/improvement-scout.md` when you need the record behind these steps.
 
 ## Available connectors
 

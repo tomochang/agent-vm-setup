@@ -17,7 +17,7 @@ description: "Prepare factory-handoff task files and F: instructions that pass t
 
 - Run `the setup tools directory/handoff_cap_check.py <task-file>` before sending the `F: repo task <id>` doorbell for a new task file, and require exit 0.
 
-- Read the full procedure in records repo `docs/infra/handoff-cap-check-2026-11-03.md` when you need the record behind these steps.
+- Read the full procedure in records repo `docs/infra/handoff-cap-check.md` when you need the record behind these steps.
 
 ## Check every instruction draft before sending
 

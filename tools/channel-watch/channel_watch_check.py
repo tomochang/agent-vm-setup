@@ -12,7 +12,7 @@ or disabled.
 
 Registry rule: when a work thread is opened on a new counterpart/agent
 channel, add the channel + its watcher hook here in the same work block
-(see records docs/infra/counterpart-watch-2026-11-04.md).
+(see records docs/infra/counterpart-watch.md).
 
 Exit 0 = all active channels watched (or Beeper unreachable — the liveness
 check owns that failure). Exit 1 = at least one FAIL line.

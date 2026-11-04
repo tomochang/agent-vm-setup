@@ -226,9 +226,9 @@ bash scripts/mail-send.sh <to> <subject> <body> [--reply-to <messageId>]
 
 ### 要返信 (2件)
 
-#### 1. 松野陽子 <yoko@helixes.co>
-**件名**: 不正利用の疑いの件
-**受信**: 2026-02-03 20:07 JST
+#### 1. 例示 花子 <hanako@example.com>
+**件名**: サンプル件名
+**受信**: 2026-01-01 00:00 UTC
 **要点**: [メール内容の要約]
 
 **返信案**:

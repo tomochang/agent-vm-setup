@@ -34,7 +34,7 @@ Helper: `python3 the records checkout/scripts/dating_context.py` (paths below ar
 - Write short, warm, natural English with light emoji. Acknowledge their latest message and make a direct, concrete invitation when it fits. Respect expressed boundaries; food plans do not establish romantic interest.
 - Use only the user's real tastes and facts. Never invent interests, experiences, or feelings. No nationality stereotypes.
 - For a dated invitation, check Calendar and travel context first. Use `docs/agent-rules/workflows.md` for venue selection and calendar changes; do not confuse an area suggestion with a home address or confirmed meeting.
-- Right before showing a draft, re-read the chat for messages newer than what the draft was built from, above all his own sent messages and the other side's proposals; if he already answered, say so instead of drafting (2026-10-26 group chat: an obsolete draft after he had replied himself).
+- Right before showing a draft, re-read the chat for messages newer than what the draft was built from, above all his own sent messages and the other side's proposals; if he already answered, say so instead of drafting (lesson from a past case: an obsolete draft shown after a reply had already been sent in a group chat).
 - Present the recipient (title + chat id) and the exact body. Creating or loading this skill isn't approval. Send one approved chat at a time; no bulk or background sends.
 
 ## 3. Send (after explicit approval of that exact recipient and body)

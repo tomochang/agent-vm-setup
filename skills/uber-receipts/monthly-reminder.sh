@@ -8,7 +8,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 LOG_FILE="$SCRIPT_DIR/logs/reminder.log"
-DISCORD_CHANNEL="channel:1465129618645192707"  # Recordsbot通知チャンネル
+DISCORD_CHANNEL="channel:0000000000000000000"  # Recordsbot通知チャンネル（自分のチャンネルIDに置き換えること）
 
 mkdir -p "$SCRIPT_DIR/logs"
 
