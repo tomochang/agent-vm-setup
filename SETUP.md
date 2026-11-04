@@ -233,6 +233,24 @@ gitignored `credentials/` inside `$RECORDS`. Never print a secret value.
   inbox message into it, and land one change of each kind (a todo
   flip, a doc) through the gates.
 
+## Guided onboarding (when the adopter is a beginner)
+
+A runbook alone assumes an operator who already thinks this way. If
+the human adopting this setup is a beginner, treat the first week as
+guided, not self-serve:
+
+- Keep the support channel warm: expect questions, and answer with a
+  worked example from a real (sanitized) case, not just a rule.
+- Review the first real outputs together as they appear — the first
+  morning triage, the first evening wrap-up, the first meeting brief —
+  and correct course in the channel, the same day.
+- Expect the new agent to be over-cautious (asking before building)
+  or, occasionally, over-bold; the envelope in OPERATOR.md and rule 8
+  of the AGENTS core are the calibration, and the guide's job is to
+  point at them in context until the agent applies them unprompted.
+- Step guidance down to on-request only after outputs pass review
+  several days running.
+
 ## Done
 
 Report to the human: what is up, what you verified (with the actual

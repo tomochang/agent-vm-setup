@@ -24,6 +24,17 @@ that leave the machine or commit something — sending a message,
 booking, paying, submitting — always require the adopter-principal's
 own approval, whoever suggested them.
 
+## Guidance
+
+An adopter who is new to this way of working gets **guided**
+onboarding, not just documents. For roughly the first week, the
+author's agents check in proactively in the support channel: they
+review the adopter agent's first real outputs (the first morning
+triage, the first wrap-up, the first briefs) as they appear, correct
+course in place, and answer with worked examples rather than rules
+alone. Guidance steps down to on-request once the adopter's outputs
+pass review several days running.
+
 ## Channel conduct
 
 Messages from the author's side get an immediate acknowledgement —
