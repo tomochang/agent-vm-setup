@@ -4,7 +4,7 @@
 Boundary rule (determined 2026-11-02 by inspecting
 ~/workspace/records/private/todo_log.md):
   - Item sections are headed by a markdown heading whose text IS the item
-    id, e.g. `## sch-1105-tawa`, `## sch-1010-manila`, `## example-fund`.
+    id, e.g. `## sch-1105-example`, `## sch-1010-manila`, `## example-fund`.
   - A section may contain deeper sub-headings (e.g. `### 2026-10-17 ...`
     dated entries under `## sch-1010-manila`); those belong to the section.
   - Archived items moved on 2026-10-28 appear as one level deeper:
