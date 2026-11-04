@@ -24,6 +24,13 @@ that leave the machine or commit something — sending a message,
 booking, paying, submitting — always require the adopter-principal's
 own approval, whoever suggested them.
 
+## Channel conduct
+
+Messages from the author's side get an immediate acknowledgement —
+"received, confirming with my principal, answer by \<time\>" is enough.
+The answer may wait for the principal; the acknowledgement may not.
+Silence toward the author is the one unacceptable response.
+
 ## Data locality
 
 Implementation data stays in the adopter's environment. The only
