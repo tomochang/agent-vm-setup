@@ -68,10 +68,12 @@ gitignored `credentials/` inside `$RECORDS`. Never print a secret value.
 4. Issue the Desktop API token with the canonical script:
    `python3 beeper/oauth_setup.py "read write"` — it registers an
    OAuth client (PKCE), you approve the connection **inside the Beeper
-   app** (the agent may drive the clicks via the CDP driver: check
-   "Allow sensitive actions", set expiry to **Never** — note the expiry
-   control is a native `<select>`; set its value, clicking the option
-   text does nothing). Tokens land in `~/.config/beeper/oauth.json`
+   app** (the agent may drive the clicks with `beeper/cdp.py`, a
+   minimal CDP driver for the renderer on port 9222 — it needs the
+   `websocket-client` Python package, e.g. installed into `~/.pylibs`:
+   check "Allow sensitive actions", set expiry to **Never** — note the
+   expiry control is a native `<select>`; set its value, clicking the
+   option text does nothing). Tokens land in `~/.config/beeper/oauth.json`
    (600). Never expires, no refresh token; on `AUTH_EXPIRED`, re-run.
 5. If your tooling wants a bare token file, copy `access_token` from
    `oauth.json` into `$RECORDS/credentials/beeper-token` (600).
