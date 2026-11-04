@@ -33,6 +33,10 @@ Supporting mechanisms (in `health/` and `templates/`):
   explicit approval gates, not agent improvisation.
 - **Coordination protocol** — when two agents serve the same human, they
   coordinate by written records and claims, not by fixed role splits.
+- **Todo system** — one state file in the records repo, flipped by
+  events and worked by two small jobs (see `todo/`). Watchers make
+  sure a counterpart's reply is noticed within minutes, and skills
+  keep the resident rule file small (see `workflows/`, `skills/`).
 
 ## What you need
 
@@ -67,6 +71,9 @@ beeper/           launch script (headless X + a11y), OAuth setup, liveness
 health/           failure ledger + health-loop templates
 healthchecks/     dead man's switch pattern (ping wiring + judge)
 templates/        AGENTS.md core rules, coordination protocol, cron patterns
+todo/             the todo system: 3-line format, state model, the two jobs, format checker
+skills/           the skill system: loadable rule bodies + the skill-map pattern
+workflows/        watchers, landing gates, worker handoff, improvement loop
 ```
 
 ## Principles worth stealing even if you take nothing else
