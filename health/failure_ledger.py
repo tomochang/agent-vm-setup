@@ -4,7 +4,8 @@
 Standard library only. See health/ and SETUP.md Phase 5 for how the
 ledger is wired into the health loop.
 
-Ledger: ~/workspace/tools/failure-ledger.jsonl (override: FAILURE_LEDGER_PATH)
+Ledger: failure-ledger.jsonl in the same directory as this script
+(override: FAILURE_LEDGER_PATH)
 Events:
   occurrence {ts, signature, note}
   mechanism  {ts, signature, mechanism}

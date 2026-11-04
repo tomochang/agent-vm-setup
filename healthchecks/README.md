@@ -19,6 +19,11 @@ schedule; a missing ping triggers an email alert.
 
 - The health loop pings **first, unconditionally**, every iteration:
   `curl -s --max-time 30 "$(grep ^ping_url= ~/.config/healthchecks/credentials | cut -d= -f2-)"`
+- **Align the phases.** A cron-scheduled check (`*/30`) expects pings
+  on its own clock slots (:00/:30) plus grace. An interval job
+  anchored at :23 pings at :23/:53 and the check flaps to `down`
+  between slots even though the loop is healthy — a false outage
+  email. Anchor the loop's phase inside the check's slots.
 - Verify after setup: test ping returns `OK`, and the API shows the
   check as `up`.
 
@@ -26,7 +31,8 @@ schedule; a missing ping triggers an email alert.
 
 A read-only consumer on another machine can poll check states via the
 API (e.g. every 15 min) and alert on transitions — an independent
-witness that does not share the pinging VM's fate.
+witness that does not share the pinging VM's fate. A minimal
+implementation ships next to this README (`judge.py`, stdlib only).
 
 The judge must treat **"the API/auth is failing"** and **"the target
 check is down"** as different states and report them differently: a

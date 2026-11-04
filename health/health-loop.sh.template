@@ -1,0 +1,25 @@
+#!/bin/bash
+# health-loop.sh — one iteration of the health loop (SETUP Phase 5).
+# Schedule it every ~30 min with your platform's job mechanism.
+# Contract: silent when everything is green; anything printed is a
+# message to the human. Ping goes FIRST and unconditionally — a loop
+# that dies before pinging is exactly what the switch watches for.
+set -u
+HERE="$(cd "$(dirname "$0")" && pwd)"
+
+# 0. dead man's switch ping (skip silently if not configured)
+CREDS="$HOME/.config/healthchecks/credentials"
+if [ -f "$CREDS" ]; then
+  PING_URL="$(grep '^ping_url=' "$CREDS" | cut -d= -f2-)"
+  [ -n "$PING_URL" ] && curl -fsS --max-time 30 "$PING_URL" >/dev/null 2>&1 || true
+fi
+
+# 1. check; if red, bootstrap once and recheck
+OUT="$("$HERE/bootstrap-check.sh" 2>&1)" && { exit 0; }
+bash "$HERE/vm-bootstrap.sh" >/dev/null 2>&1 || true
+OUT2="$("$HERE/bootstrap-check.sh" 2>&1)" && { echo "health: recovered after bootstrap"; exit 0; }
+
+# 2. still red: surface the failing lines only
+echo "health: FAILING after bootstrap"
+echo "$OUT2" | grep -E '^(FAIL|WARN)' || echo "$OUT2"
+exit 1

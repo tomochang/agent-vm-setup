@@ -6,6 +6,7 @@ Usage:
   beeper_api.py messages <chatID> [--limit N]
   beeper_api.py search <query>
   beeper_api.py send <chatID> <text...>   (write scope; use only per the caller's rules)
+  beeper_api.py send-file <chatID> <path>  (attachment via /v1/assets/upload, then the message)
 Exit 3 + 'AUTH_EXPIRED' on stderr when the token is missing/expired/rejected
 (current token: read+write, non-expiring 'Never', no refresh token — re-run
 oauth_setup.py "read write" to replace it)."""
@@ -64,6 +65,40 @@ def post(path, payload):
         print(f"UNREACHABLE: {e}", file=sys.stderr)
         sys.exit(2)
 
+def upload(path):
+    """POST the file to /v1/assets/upload (multipart) and return its uploadID.
+    File sending goes through this API route — not the UI. Send any cover
+    text as a separate text message, and verify by reading the thread back."""
+    import mimetypes, uuid
+    data = open(path, "rb").read()
+    name = os.path.basename(path)
+    ctype = mimetypes.guess_type(name)[0] or "application/octet-stream"
+    boundary = "----beeperapi" + uuid.uuid4().hex
+    body = (f"--{boundary}\r\n"
+            f'Content-Disposition: form-data; name="file"; filename="{name}"\r\n'
+            f"Content-Type: {ctype}\r\n\r\n").encode() + data + \
+           f"\r\n--{boundary}--\r\n".encode()
+    req = urllib.request.Request(BASE + "/v1/assets/upload", data=body, method="POST",
+                                 headers={"Authorization": "Bearer " + token(),
+                                          "Content-Type": f"multipart/form-data; boundary={boundary}"})
+    try:
+        with urllib.request.urlopen(req, timeout=120) as r:
+            d = json.load(r)
+    except urllib.error.HTTPError as e:
+        if e.code == 401:
+            print("AUTH_EXPIRED", file=sys.stderr)
+            sys.exit(3)
+        print(f"HTTP {e.code} on upload", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"UNREACHABLE: {e}", file=sys.stderr)
+        sys.exit(2)
+    uid = d.get("uploadID") or d.get("uploadId") or d.get("id")
+    if not uid:
+        print(f"upload returned no uploadID: {str(d)[:200]}", file=sys.stderr)
+        sys.exit(1)
+    return uid
+
 def main():
     args = sys.argv[1:]
     limit = 30
@@ -95,6 +130,11 @@ def main():
     elif cmd == "send" and len(args) > 2:
         d = post(f"/v1/chats/{urllib.parse.quote(args[1], safe='')}/messages",
                  {"text": " ".join(args[2:])})
+        print(json.dumps(d, ensure_ascii=False, indent=1)[:1000])
+    elif cmd == "send-file" and len(args) > 2:
+        uid = upload(args[2])
+        d = post(f"/v1/chats/{urllib.parse.quote(args[1], safe='')}/messages",
+                 {"attachment": {"uploadID": uid}})
         print(json.dumps(d, ensure_ascii=False, indent=1)[:1000])
     else:
         print(__doc__, file=sys.stderr)

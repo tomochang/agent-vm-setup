@@ -7,6 +7,7 @@ fail=0
 ok()   { echo "OK   $*"; }
 bad()  { echo "FAIL $*"; fail=1; }
 warn() { echo "WARN $*"; }
+RECORDS="${RECORDS:-$HOME/records}"   # your records repo (SETUP Phase 1)
 
 # --- tools (prefer $HOME installs: /usr and /root may be wiped) ---
 if command -v claude >/dev/null 2>&1 || [ -x "$HOME/.npm-global/bin/claude" ]; then ok "claude: present"; else bad "claude: MISSING (run vm-bootstrap)"; fi
@@ -18,18 +19,33 @@ if [ -f "$HOME/.config/gh/hosts.yml" ]; then ok "gh auth file: present"; else ba
 if [ -f "$HOME/.ssh/config" ]; then ok "ssh config: present"; else bad "ssh config: MISSING"; fi
 
 # --- Beeper: process up AND Desktop API answering with the stored token ---
-BEEPER_TOKEN_FILE="$HOME/records/credentials/beeper-token"   # adapt path
+# The token is read inside python, never placed on a command line
+# (argv is world-readable via /proc).
+BEEPER_TOKEN_FILE="$RECORDS/credentials/beeper-token"   # adapt path
+beeper_code() {
+  python3 - "$BEEPER_TOKEN_FILE" << 'PYEOF'
+import sys, urllib.request
+tok = open(sys.argv[1]).read().strip()
+req = urllib.request.Request("http://127.0.0.1:23373/v1/accounts",
+                             headers={"Authorization": "Bearer " + tok})
+try:
+    with urllib.request.urlopen(req, timeout=5) as r:
+        print(r.status)
+except Exception as e:
+    print(getattr(e, "code", "ERR"))
+PYEOF
+}
 if ! pgrep -f '[b]eepertexts' >/dev/null 2>&1; then
   bad "beeper: process not running (run vm-bootstrap)"
 elif [ ! -f "$BEEPER_TOKEN_FILE" ]; then
   bad "beeper: API token file missing — run beeper/oauth_setup.py"
-elif [ "$(curl -s -o /dev/null -m 5 -w '%{http_code}' -H "Authorization: Bearer $(cat "$BEEPER_TOKEN_FILE")" http://127.0.0.1:23373/v1/accounts)" = "200" ]; then
+elif [ "$(beeper_code)" = "200" ]; then
   ok "beeper: process up, Desktop API answers 200 (read/send path works)"
 else
   bad "beeper: Desktop API did not answer 200 (token expired? re-run beeper/oauth_setup.py)"
 fi
 
 # --- records repo present and clean-ish ---
-[ -d "$HOME/records/.git" ] && ok "records repo: present" || bad "records repo: MISSING"
+[ -d "$RECORDS/.git" ] && ok "records repo: present" || bad "records repo: MISSING"
 
 exit $fail

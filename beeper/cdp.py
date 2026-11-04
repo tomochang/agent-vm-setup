@@ -20,7 +20,9 @@ def page_ws_url() -> str:
     with urllib.request.urlopen(f"{CDP}/json", timeout=5) as r:
         targets = json.load(r)
     for t in targets:
-        if t.get("type") == "page" and t.get("title") == "Beeper":
+        # Title match is "contains": an unread-count prefix in the
+        # window title must not break every call.
+        if t.get("type") == "page" and "Beeper" in (t.get("title") or ""):
             return t["webSocketDebuggerUrl"]
     raise RuntimeError("Beeper page target not found")
 
@@ -52,6 +54,9 @@ class CDPClient:
 
 
 def main():
+    if len(sys.argv) < 2:
+        print(__doc__, file=sys.stderr)
+        sys.exit(64)
     cmd = sys.argv[1]
     c = CDPClient()
     if cmd == "eval":

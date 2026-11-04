@@ -12,6 +12,11 @@ gitignored `credentials/` inside `$RECORDS`. Never print a secret value.
 
 ## Phase 0 — Environment survey
 
+- These VMs are single-tenant agent boxes: the setup and the health
+  loop run as root (or with sudo throughout), and `$HOME` below is the
+  agent user's home. State which user you are before Phase 1.
+- Clone this repo somewhere stable, e.g. `~/workspace/agent-vm-setup`;
+  later phases reference its files by relative path from there.
 - Confirm: Linux, persistent home, `git`, `python3`, `node`/`npm`,
   `curl` available. Note what is missing; install with the system
   package manager where possible.
@@ -29,24 +34,40 @@ gitignored `credentials/` inside `$RECORDS`. Never print a secret value.
 
 1. **[HUMAN]** Human signs in to GitHub (passkey) and creates a
    *private* repo, e.g. `records`. (Or creates it and adds you.)
-2. Clone it. Create the skeleton:
+2. Give the VM its own access — a repo-scoped **deploy key**, not the
+   human's login: `ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519`, then
+   **[HUMAN]** pastes the *public* key into the repo's Settings →
+   Deploy keys (write access on). Add an `~/.ssh/config` host block
+   for `github.com` (if your egress needs the port-443 endpoint, use
+   `HostName ssh.github.com`, `Port 443`). The `gh` CLI is optional;
+   if you install it, **[HUMAN]** runs its device-flow login once so
+   `~/.config/gh/hosts.yml` exists under `$HOME` (not a volatile
+   path).
+3. Clone it. Create the skeleton:
    `docs/`, `skills/`, `tools/`, `private/` (todo + records),
    `credentials/` (gitignored), `templates/` copied from this repo.
-3. Add `.gitignore` entries: `credentials/`, `*.token`, `oauth.json`.
-4. Land the first commit through the gate pattern you will use from
-   now on: work in a branch/worktree, never commit directly on the
-   shared clone's main.
+4. Add `.gitignore` entries: `credentials/`, `*-credentials`,
+   `*.token`, `oauth.json`, `.env`.
+5. Commit the skeleton on a branch/worktree, never directly on the
+   shared clone's main. The full landing gates are decided in
+   Phase 6; until then, branch + the human's glance is enough — do
+   not invent extra approval stops.
 - **Verify**: a trivial change lands and `git pull` on the main clone
   shows it.
 
 ## Phase 2 — Builder and reviewer sign-ins
 
-1. Install Claude Code into a persistent prefix
-   (`npm config set prefix ~/.npm-global` style) so a VM replacement
-   does not remove it.
+1. Install Claude Code into a persistent prefix so a VM replacement
+   does not remove it: `npm config set prefix ~/.npm-global`, add
+   `~/.npm-global/bin` to PATH (in `~/.bashrc` — checks that call
+   `command -v` fail without it), then
+   `npm install -g @anthropic-ai/claude-code`. Claude Code and Codex
+   need Node 20+; if the distro's `nodejs` is older, install a
+   current Node first (vendor tarball into `$HOME`, or NodeSource) —
+   do not let Phase 0's package manager strand you on an old one.
 2. **[HUMAN]** Claude Code OAuth sign-in. Run a trivial prompt inside
    the records repo as a smoke test.
-3. Install Codex similarly.
+3. Install Codex similarly: `npm install -g @openai/codex`.
 4. **[HUMAN]** Codex device-flow sign-in.
 5. Note for later: on some VM images the bundled `codex` binary lacks
    its code-mode host and crashes on tool use. If bare `codex exec`
@@ -57,26 +78,45 @@ gitignored `credentials/` inside `$RECORDS`. Never print a secret value.
 
 ## Phase 3 — Beeper (the inbox)
 
-1. Download Beeper Desktop (Linux AppImage), extract it
-   (`--appimage-extract`) to `~/Applications/squashfs-root` — no FUSE
-   needed.
-2. Copy `beeper/launch-beeper.sh` to `~/workspace/beeper-diag/` and run
-   it. It brings up Xvfb `:99`, a D-Bus session, the accessibility bus,
-   openbox, and Beeper with CDP on 9222 and the local API on 23373.
-3. **[HUMAN]** Sign in: email code, then SAS emoji verification with
-   the phone. Wait for initial sync to finish.
+1. Install the headless-desktop dependencies first (a clean Ubuntu
+   has none of them): `apt-get install -y xvfb openbox at-spi2-core
+   libglib2.0-bin libgtk-3-0 libnss3 libasound2 libgbm1 libxss1`.
+   Download Beeper Desktop (Linux AppImage) from beeper.com/download,
+   `chmod +x` it, then `cd ~/Applications` and extract it there
+   (`--appimage-extract` writes `squashfs-root` into the *current*
+   directory) — no FUSE needed.
+2. Copy the whole `beeper/` directory to `~/workspace/beeper-diag/`
+   (the liveness script imports its sibling `beeper_api.py` and calls
+   its sibling launcher) and run `launch-beeper.sh`. It brings up
+   Xvfb `:99`, a D-Bus session, the accessibility bus, openbox, and
+   Beeper with CDP on 9222 and the local API on 23373. If 23373 does
+   not answer once the app is up, enable the Desktop API in Beeper's
+   settings and relaunch.
+3. **[HUMAN]** Sign in — but the human never sees this VM's display:
+   Beeper runs on headless Xvfb. You drive the sign-in screen via
+   `beeper/cdp.py`: read the email-code field state and the SAS emoji
+   sequence out of the DOM, relay them to the human over chat, and
+   type the code they give you back. Wait for initial sync to finish.
 4. Issue the Desktop API token with the canonical script:
-   `python3 beeper/oauth_setup.py "read write"` — it registers an
-   OAuth client (PKCE), you approve the connection **inside the Beeper
-   app** (the agent may drive the clicks with `beeper/cdp.py`, a
-   minimal CDP driver for the renderer on port 9222 — it needs the
-   `websocket-client` Python package, e.g. installed into `~/.pylibs`:
-   check "Allow sensitive actions", set expiry to **Never** — note the
-   expiry control is a native `<select>`; set its value, clicking the
-   option text does nothing). Tokens land in `~/.config/beeper/oauth.json`
+   `python3 beeper/oauth_setup.py "read write"`. It prints an
+   `AUTH_URL` and waits for a redirect to a local callback — open the
+   URL **inside the Beeper renderer** via `cdp.py` (assign
+   `location.href`); the consent screen renders in the app itself.
+   The clicks are yours (the agent's), driven by `cdp.py` — it needs
+   `websocket-client` where `cdp.py` looks for it:
+   `python3 -m pip install --target ~/.pylibs websocket-client`
+   (on PEP 668 systems that `--target` form is the one that works).
+   On the consent screen: check "Allow sensitive actions", and set
+   expiry to **Never** — the expiry control is a native `<select>`;
+   find the option whose text is "Never", assign that option's value
+   to `select.value`, and dispatch a `change` event (clicking the
+   option text does nothing, and a silent 30-day default is the
+   classic failure). Tokens land in `~/.config/beeper/oauth.json`
    (600). Never expires, no refresh token; on `AUTH_EXPIRED`, re-run.
-5. If your tooling wants a bare token file, copy `access_token` from
-   `oauth.json` into `$RECORDS/credentials/beeper-token` (600).
+5. `oauth.json` is the canonical token store. The bootstrap-check
+   template also wants a bare token file: copy `access_token` from
+   `oauth.json` into `$RECORDS/credentials/beeper-token` (600) — a
+   derived copy; refresh it whenever you re-issue the token.
 6. Sending attachments goes through the API, not the UI:
    `POST /v1/assets/upload` (multipart) → `uploadID` →
    `POST /v1/chats/<chatID>/messages` with
@@ -84,20 +124,27 @@ gitignored `credentials/` inside `$RECORDS`. Never print a secret value.
    message and verify by reading the thread back.
 - **Verify**: `curl -H "Authorization: Bearer <token>"
   http://127.0.0.1:23373/v1/accounts` returns 200 and your accounts;
-  a chat search finds a known conversation. Restart Beeper via the
-  launch script and confirm the API comes back.
+  a chat search finds a known conversation. Restart Beeper — kill it
+  first with the bracket form `pkill -f '[b]eepertexts'` (a plain
+  pattern matches your own shell's command line and kills it), then
+  run the launch script — and confirm the API comes back. The
+  launcher alone exits 0 without restarting when Beeper is already
+  running.
 
 ## Phase 4 — healthchecks.io (dead man's switch)
 
-1. Create a free account. The agent-managed route: request the emailed
-   login link, read it from the connected mailbox, open it in the
-   browser session, and you are in — no password needs inventing.
-   **[HUMAN]** only if the account already belongs to the human and
-   they want to tap anything themselves.
+1. Create a free account, registered to an email address the agent
+   can read (or the human's own, if they prefer). The agent-managed
+   route: request the emailed login link, read it from the connected
+   mailbox, open it in the browser session, and you are in — no
+   password needs inventing. **[HUMAN]** only if the account already
+   belongs to the human and they want to tap anything themselves.
 2. Add a check: cron schedule matching your health loop (e.g.
    `*/30 * * * *`), grace 15 min, email notifications on.
-3. Store the ping URL (and a *read-only* API key if you will run a
-   judge) in `~/.config/healthchecks/credentials` (600). One warning
+3. Store the ping URL **and a read-only API key** in
+   `~/.config/healthchecks/credentials` (600), one `key=value` per
+   line: `ping_url=...`, `api_key_readonly=...`. The key is not optional
+   decoration — the Verify step below and any judge read through it. One warning
    earned in production: rotating the read-only key breaks every other
    consumer of the old key (another agent's judge got a 401). Hand a
    replacement key to another agent only encrypted to a public key
@@ -116,9 +163,11 @@ gitignored `credentials/` inside `$RECORDS`. Never print a secret value.
    everything a VM replacement wipes (mirrors into volatile paths,
    app relaunches including Beeper, locales, temp dirs). Single
    instance (flock). It is called *by* the loop, never by hand-waving.
-3. Schedule a 30-minute job: ping (Phase 4) → check → bootstrap once →
-   recheck → surface remaining failures to the human, stay silent
-   when all green.
+3. Schedule a 30-minute job running `health/health-loop.sh.template`
+   (adapted): ping (Phase 4) → check → bootstrap once → recheck →
+   surface remaining failures to the human, stay silent when all
+   green. The channel it surfaces on is your normal chat with the
+   human — the job's non-empty output is the message.
 4. Initialize `health/failure_ledger.py` next to its JSONL log; add a
    30-minute check job that stays silent unless an unresolved repeated
    failure exists.
