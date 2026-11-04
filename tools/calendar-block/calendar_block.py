@@ -17,11 +17,12 @@ Run it BEFORE patching an event's time and AGAIN after, to verify the
 block (main + movement events) is contiguous and consistent.
 """
 import json
+import os
 import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
 
-CLI = "/opt/hatch/bin/hatch_gws_cli"
+CLI = os.environ.get("GWS_CLI", "hatch_gws_cli")
 JST = timezone(timedelta(hours=9))
 
 

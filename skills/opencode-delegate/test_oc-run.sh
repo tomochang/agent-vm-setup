@@ -31,11 +31,11 @@ bash "$SUT" --dir "$T/work" --plan --model opencode/x "q" >/dev/null 2>&1
 grep -qx -- "--agent" "$T/args" && grep -qx "plan" "$T/args" && ok "--plan" || ng "--plan"
 grep -qx "opencode/x" "$T/args" && ok "--model" || ng "--model"
 
-# 3. refuses ~/clawd and $HOME
+# 3. refuses ~/records and $HOME
 : > "$T/args"
-bash "$SUT" --dir "$HOME/clawd" "q" >/dev/null 2>&1; rc=$?
-[ $rc -eq 2 ] && [ ! -s "$T/args" ] && ok "blocks ~/clawd" || ng "blocks ~/clawd (rc=$rc)"
-bash "$SUT" --dir "$HOME/clawd/skills" "q" >/dev/null 2>&1; [ $? -eq 2 ] && ok "blocks ~/clawd subdir" || ng "blocks ~/clawd subdir"
+bash "$SUT" --dir "$HOME/records" "q" >/dev/null 2>&1; rc=$?
+[ $rc -eq 2 ] && [ ! -s "$T/args" ] && ok "blocks ~/records" || ng "blocks ~/records (rc=$rc)"
+bash "$SUT" --dir "$HOME/records/skills" "q" >/dev/null 2>&1; [ $? -eq 2 ] && ok "blocks ~/records subdir" || ng "blocks ~/records subdir"
 bash "$SUT" --dir "$HOME" "q" >/dev/null 2>&1; [ $? -eq 2 ] && ok "blocks \$HOME" || ng "blocks \$HOME"
 
 # 4. timeout

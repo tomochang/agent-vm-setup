@@ -217,12 +217,12 @@ gitignored `credentials/` inside `$RECORDS`. Never print a secret value.
    `SKILL.md` (see `skills/README.md` for the format and authoring
    rules) and put the *situation → skill* row for it in the resident
    file's map. Start with the procedures you already repeat.
-4. **Skills + tools full set.** `skills/` ships 45 generalized
+3. **Skills + tools full set.** `skills/` ships 45 generalized
    procedures and `tools/` ships the operator tools (coverage
    checks, watchers, spend governor, receipt library). Copy the
    ones you need into the records repo's tooling and set the path
    env vars noted in `tools/README.md`.
-3. **Workflows.** Adopt as needed: watchers
+4. **Workflows.** Adopt as needed: watchers
    (`workflows/watchers.md`) for every chat where a counterpart's
    reply matters — registered in the health loop's coverage check in
    the same step; the gates flow (`workflows/gates.md`) for all

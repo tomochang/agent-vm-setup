@@ -76,11 +76,11 @@ cat private/todo.md | head -100
 
 ```bash
 # 社内・重要メール（サポート・プロモ・フォーラム除外、直近24h）
-GOG_KEYRING_PASSWORD=$GOG_KEYRING_PASSWORD /home/openclaw/bin/gog gmail search \
+GOG_KEYRING_PASSWORD=$GOG_KEYRING_PASSWORD gog gmail search \
   "newer_than:1d -label:OPERATOR-COMPANY-Support -category:promotions -category:social -category:forums -category:updates -in:trash" \
   --max 30 --account operator-secondary@example.com
 
-GOG_KEYRING_PASSWORD=$GOG_KEYRING_PASSWORD /home/openclaw/bin/gog gmail search \
+GOG_KEYRING_PASSWORD=$GOG_KEYRING_PASSWORD gog gmail search \
   "newer_than:1d" --max 10 --account operator@example.com 2>/dev/null || true
 ```
 
@@ -113,7 +113,7 @@ GOG_KEYRING_PASSWORD=$GOG_KEYRING_PASSWORD /home/openclaw/bin/gog gmail search \
 ### 1-C: カレンダー + Todo
 
 ```bash
-GOG_KEYRING_PASSWORD=$GOG_KEYRING_PASSWORD /home/openclaw/bin/gog calendar events \
+GOG_KEYRING_PASSWORD=$GOG_KEYRING_PASSWORD gog calendar events \
   --today --all --max 30 --account operator-secondary@example.com
 ```
 
@@ -186,7 +186,7 @@ action_required / meeting_info の項目を `private/todo.md` に登録する。
 ```
 
 ```bash
-GOG_KEYRING_PASSWORD=$GOG_KEYRING_PASSWORD /home/openclaw/bin/gog calendar freebusy \
+GOG_KEYRING_PASSWORD=$GOG_KEYRING_PASSWORD gog calendar freebusy \
   --start "YYYY-MM-DDT00:00:00+09:00" --end "YYYY-MM-DDT00:00:00+09:00" \
   --account operator-secondary@example.com
 ```
@@ -244,7 +244,7 @@ python3 scripts/comms-check.py /tmp/comms-draft.json
 
 **メール:**
 ```bash
-GOG_KEYRING_PASSWORD=$GOG_KEYRING_PASSWORD /home/openclaw/bin/gog gmail send \
+GOG_KEYRING_PASSWORD=$GOG_KEYRING_PASSWORD gog gmail send \
   --reply-to-message-id "<messageId>" \
   --to "<recipient>" --body "<reply>" \
   --account operator-secondary@example.com
@@ -285,7 +285,7 @@ python3 scripts/pid_manager.py next
 ## Step 5: git commit
 
 ```bash
-cd /home/openclaw/.openclaw/workspace && git add -A && \
+cd $HOME/workspace && git add -A && \
   git commit -m "today: morning triage" && python3 scripts/records_gate.py push
 ```
 

@@ -20,7 +20,7 @@ the operator's voice already exists as data. Never invent a tone from scratch �
 - **Register = relationship.** Close/friends: plain casual, zero keigo piles — excessive formality creates distance and reads wrong. ❌「ご都合いかがでしょうか？」to a friend → ✅「水木どっちか空いてます」
 - **Land with his own move**: a proposal, a next step, a decision — not an open-ended question dumped back on the other person.
 - **Meaning over titles/details** when describing people or situations: what they mean to the recipient, in one line.
-- Business counterparts (firms, officials, first contacts): polite です・ます with numbered structure when listing points — modeled on his real sent messages (e.g. his 2026-10-30 Kamachi message). Polite but not servile; he does not pile up apologies.
+- Business counterparts (firms, officials, first contacts): polite です・ます with numbered structure when listing points — modeled on past sent messages to professional firms (fictional example: a message to the invented firm 'Aoba Consulting'). Polite but not servile; he does not pile up apologies.
 - Signature on business mail: 「the operator」.
 
 ## Failure that created this skill (2026-11-04)
@@ -31,7 +31,7 @@ Correct shape for a friend decline: gratitude for the invite → plain regret �
 
 ## Names and facts in drafts
 
-- **Copy proper nouns in the exact script of the source record.** カマチ stays カマチ (katakana) — never guess kanji for a name （鎌塚 incident, 2026-11-04). Same for 蒲地： use only the script the record itself uses.
+- **Copy proper nouns in the exact script of the source record.** ミライ stays ミライ (katakana) — never guess kanji for a name (the fictional example's wrong guess was 未来).
 - Facts (dates, amounts, decisions) come from the record, verified before drafting — see skill `research_method` (decision-check) and `todo_verification` when a draft touches todo state.
 
 ## Presenting a draft — grounding citation is mandatory

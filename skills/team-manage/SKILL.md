@@ -31,7 +31,7 @@ description: 5エージェントチームのタスク管理・進捗監視・ク
 ### Step 1: チーム状態確認
 
 ```bash
-$HOME/records repo/scripts/tmux-team.sh status
+$HOME/records/scripts/tmux-team.sh status
 ```
 
 全ペインの状態を確認し、利用可能な実装者を特定する。
@@ -50,8 +50,8 @@ $HOME/records repo/scripts/tmux-team.sh status
 空いている実装者に `assign` でタスクを送信。**必ず `pwd && git status` チェックを含める:**
 
 ```bash
-$HOME/records repo/scripts/tmux-team.sh assign cl1 "cd /Users/tomo/records repo/research/neobank-ui-design && pwd && git status && <タスク内容>"
-$HOME/records repo/scripts/tmux-team.sh assign cx1 "cd /Users/tomo/records repo/research/neobank-ui-design && pwd && git status && <タスク内容>"
+$HOME/records/scripts/tmux-team.sh assign cl1 "cd $HOME/records/research/neobank-ui-design && pwd && git status && <タスク内容>"
+$HOME/records/scripts/tmux-team.sh assign cx1 "cd $HOME/records/research/neobank-ui-design && pwd && git status && <タスク内容>"
 ```
 
 ### Step 4: 進捗監視
@@ -59,7 +59,7 @@ $HOME/records repo/scripts/tmux-team.sh assign cx1 "cd /Users/tomo/records repo/
 定期的に `capture-all` で全ペインの出力を確認:
 
 ```bash
-$HOME/records repo/scripts/tmux-team.sh capture-all 50
+$HOME/records/scripts/tmux-team.sh capture-all 50
 ```
 
 - `DONE:` を検出 → クロスレビューへ
@@ -70,10 +70,10 @@ $HOME/records repo/scripts/tmux-team.sh capture-all 50
 
 ```bash
 # Claude実装 → Codexレビュー
-$HOME/records repo/scripts/tmux-team.sh review-route cl1 cx1
+$HOME/records/scripts/tmux-team.sh review-route cl1 cx1
 
 # Codex実装 → Claudeレビュー
-$HOME/records repo/scripts/tmux-team.sh review-route cx1 cl2
+$HOME/records/scripts/tmux-team.sh review-route cx1 cl2
 ```
 
 ### Step 6: 完了報告

@@ -23,7 +23,7 @@ skills/schedule-optimizer/
 ### 1. カレンダーデータを取得する（gogcli）
 
 ```bash
-GOG_KEYRING_PASSWORD=$GOG_KEYRING_PASSWORD /home/openclaw/bin/gog calendar events \
+GOG_KEYRING_PASSWORD=$GOG_KEYRING_PASSWORD gog calendar events \
   --from 2026-03-10 --to 2026-03-14 \
   --account operator-secondary@example.com \
   --all --json > /tmp/events.json
@@ -61,7 +61,7 @@ python3 skills/schedule-optimizer/scripts/optimizer.py \
 ### 3. ワンライナー（gogcli + optimizer）
 
 ```bash
-GOG_KEYRING_PASSWORD=$GOG_KEYRING_PASSWORD /home/openclaw/bin/gog calendar events \
+GOG_KEYRING_PASSWORD=$GOG_KEYRING_PASSWORD gog calendar events \
   --from 2026-03-10 --to 2026-03-14 \
   --account operator-secondary@example.com \
   --all --json \

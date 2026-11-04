@@ -3,7 +3,7 @@
 
 Born from the 2026-11-02 env_heal miss: a tool was built, wired into
 HEARTBEAT, and called done while its procedure doc had never been landed
-in clawd docs/infra (the operator's reproducibility rule). Extended the same
+in records docs/infra (the operator's reproducibility rule). Extended the same
 night at the operator's probing ("what about the ones NOT in HEARTBEAT?") from
 HEARTBEAT-wired tools to the full tool directories.
 
@@ -29,7 +29,7 @@ from pathlib import Path
 
 HOME = Path.home()
 HEARTBEAT = Path(os.environ.get("DOC_COVERAGE_HEARTBEAT", HOME / "HEARTBEAT.md"))
-CLAWD = Path(os.environ.get("RECORDS_DIR", str(HOME / "workspace/clawd")))
+RECORDS = Path(os.environ.get("RECORDS_DIR", str(HOME / "workspace/records")))
 _tool_dirs = os.environ.get("AGENT_TOOL_DIRS")
 TOOL_DIRS = ([Path(d) for d in _tool_dirs.split(":")] if _tool_dirs else
              [HOME / "workspace/tools", HOME / "workspace/beeper-diag",
@@ -56,7 +56,7 @@ def run(cmd, timeout=None):
 def main():
     stale = False
     try:
-        r = run(["git", "-C", str(CLAWD), "fetch", "--quiet", "origin"], timeout=30)
+        r = run(["git", "-C", str(RECORDS), "fetch", "--quiet", "origin"], timeout=30)
         stale = r.returncode != 0
     except Exception:
         stale = True
@@ -85,7 +85,7 @@ def main():
     fail = 0
     for rel, name in sorted(covered.items()):
         stem = Path(name).stem
-        r = run(["git", "-C", str(CLAWD), "grep", "-l", stem, "origin/main", "--", "docs/infra/"])
+        r = run(["git", "-C", str(RECORDS), "grep", "-l", stem, "origin/main", "--", "docs/infra/"])
         docs = [ln.split(":", 1)[1] for ln in r.stdout.splitlines() if ":" in ln]
         if docs:
             print(f"OK   {rel} — documented in {docs[0]}")

@@ -10,7 +10,7 @@ def fetch(path, owner=None, repo=None):
     if not owner or not repo:
         return None, "set RECORDS_OWNER and RECORDS_REPO, or pass owner and repo as argv[2]/argv[3]"
     args = json.dumps({"owner": owner, "repo": repo, "path": path})
-    out = subprocess.run(["/opt/hatch/bin/github","call-read-tool","--name","get_file_contents","--arguments-json",args], capture_output=True, text=True)
+    out = subprocess.run([os.environ.get("GITHUB_CLI", "github"),"call-read-tool","--name","get_file_contents","--arguments-json",args], capture_output=True, text=True)
     try:
         d = json.loads(out.stdout)
     except Exception:

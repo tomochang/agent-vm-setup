@@ -9,7 +9,7 @@ already decided) and presents at most 3 proposals.
 Signals:
   failure_ledger    signatures with occurrences and no recorded mechanism
                     (count 1 = mechanism candidate, >=2 = unresolved repeat)
-  stale_worktrees   clawd worktrees whose branch tip is fully contained in
+  stale_worktrees   records worktrees whose branch tip is fully contained in
                     origin/main (landed leftovers, safe to remove)
   handoff_branches  factory-handoff remote task/* branches already merged
                     into that repo's main (cleanup candidates)
@@ -38,7 +38,7 @@ from zoneinfo import ZoneInfo
 
 HOME = os.path.expanduser("~")
 LEDGER = os.environ.get("FAILURE_LEDGER", os.path.join(HOME, "workspace/tools/failure-ledger.jsonl"))
-CLAWD = os.environ.get("RECORDS_DIR", os.path.join(HOME, "workspace/clawd"))
+RECORDS = os.environ.get("RECORDS_DIR", os.path.join(HOME, "workspace/records"))
 HANDOFF = os.environ.get("HANDOFF_DIR", os.path.join(HOME, "workspace/factory-handoff"))
 ITEMS_DIR = os.environ.get("ITEMS_DIR", os.path.join(HOME, "workspace/your_files/agent-todo-items"))
 AGING_DAYS = 5
@@ -73,7 +73,7 @@ def git(repo, *args):
 
 
 def stale_worktrees():
-    out = git(CLAWD, "worktree", "list", "--porcelain")
+    out = git(RECORDS, "worktree", "list", "--porcelain")
     if out is None:
         return None
     stale, current = [], None
@@ -86,10 +86,10 @@ def stale_worktrees():
             current["branch"] = line[7:].replace("refs/heads/", "")
     for e in entries:
         branch = e.get("branch")
-        if not branch or e["path"] == CLAWD:
+        if not branch or e["path"] == RECORDS:
             continue
         r = subprocess.run(
-            ["git", "-C", CLAWD, "merge-base", "--is-ancestor",
+            ["git", "-C", RECORDS, "merge-base", "--is-ancestor",
              f"refs/heads/{branch}", "origin/main"],
             capture_output=True, timeout=30)
         if r.returncode == 0:
@@ -149,8 +149,8 @@ def _todo_text():
                 return f.read()
         except OSError:
             return None
-    git(CLAWD, "fetch", "origin", "-q")
-    return git(CLAWD, "show", "origin/main:private/todo.md")
+    git(RECORDS, "fetch", "origin", "-q")
+    return git(RECORDS, "show", "origin/main:private/todo.md")
 
 
 def _md_date(month, day, today):

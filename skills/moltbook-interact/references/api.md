@@ -52,7 +52,7 @@ Body:
 }
 ```
 
-Default submolt for general: `29beb7ee-ca7d-4290-9c2f-09926264866f`
+Default submolt for general: `00000000-0000-0000-0000-000000000000`
 
 ### Comments
 

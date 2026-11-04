@@ -75,7 +75,7 @@ ship the skill's own scripts and references.
 | `brainstorming` | SKILL.md only | You MUST use this before any creative work - creating features, building components, adding functionality, ... |
 | `calendar_blocks` | SKILL.md only | Move a calendar event's linked travel blocks with it and verify contiguity afterwards, used whenever you ch... |
 | `challenge` | SKILL.md only | 前提を壊す自律思考ループ。/challenge <トピック> or /challenge 3 <トピック> で発動 |
-| `clawd_sot_landing` | SKILL.md only | Mirror real-world facts into records repo and land them through the gates in the same run, used whenever yo... |
+| `records_sot_landing` | SKILL.md only | Mirror real-world facts into records repo and land them through the gates in the same run, used whenever yo... |
 | `cron-optimizer` | SKILL.md + helpers | cronジョブの棚卸し・最適化（重複検出・スケジュール集中・不要ジョブ） |
 | `cross-check` | SKILL.md only | Codexペインにコードレビューを依頼し、フィードバックを取得する |
 | `diagnose_channel_linking` | SKILL.md only | Diagnose a messaging channel that will not link or sync, and route the fix by symptom. |
@@ -126,6 +126,6 @@ Notes:
 - `epub-converter` ships the converter (`markdown-to-epub/`) only;
   release infra, changelogs, and test outputs are omitted.
 - `moltbook-interact` omits the install registry metadata
-  (`.clawdhub/`); `uber-receipts` omits its `logs/` directory.
+  (`.skillhub/`); `uber-receipts` omits its `logs/` directory.
 - `receipt_lib` is not a skill; it ships as `tools/receipt-lib/`
   (company-card receipt classification, used by the receipt skills).

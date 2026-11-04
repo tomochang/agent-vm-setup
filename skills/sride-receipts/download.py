@@ -148,9 +148,9 @@ def process_sride_receipts(
 ) -> list[Receipt]:
     """S.RIDE領収書のメイン処理パイプライン"""
     if output_dir is None:
-        output_dir = Path.home() / "clawd" / "receipts"
+        output_dir = Path.home() / "records" / "receipts"
     if receipts_dir is None:
-        receipts_dir = Path.home() / "clawd" / "receipts"
+        receipts_dir = Path.home() / "records" / "receipts"
 
     # 月パース
     target_year, target_month = None, None

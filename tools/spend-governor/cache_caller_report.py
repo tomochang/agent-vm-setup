@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Caller-split prompt-cache report for VM-local Claude Code CLI sessions.
 
-WHY: the cache-efficiency research (clawd research/cache-efficiency, Lv3
+WHY: the cache-efficiency research (records research/cache-efficiency, Lv3
 claim #4) found that an AVERAGE cache hit rate hides the callers that never
 share a prefix -- in one measured case an average of 77% sat next to cron
 callers at ~0%. This tool aggregates the official confirmation fields

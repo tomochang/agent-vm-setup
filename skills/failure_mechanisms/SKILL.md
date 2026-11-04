@@ -13,7 +13,7 @@ description: "Record failures in the ledger and close repeats with structural me
 
 - Reuse an existing signature for the same kind of failure. Run `python3 the setup tools directory/failure_ledger.py list` to see the signatures already in use.
 
-- Read the full procedure in records repo `docs/infra/mofu-failure-ledger-2026-11-03.md` when you need the record behind these steps.
+- Read the full procedure in records repo `docs/infra/failure-ledger-2026-11-03.md` when you need the record behind these steps.
 
 ## Close a repeat with a structural mechanism
 
@@ -31,7 +31,7 @@ description: "Record failures in the ledger and close repeats with structural me
 
 - Run `the setup tools directory/mechanism_coverage_check.py` to confirm coverage. The check default-denies every git repo under ~/workspace except records repo and every research topic holding a spec or trial doc.
 
-- Read the full procedure in records repo `docs/infra/mofu-mechanism-coverage-2026-11-03.md` when you need the record behind these steps.
+- Read the full procedure in records repo `docs/infra/mechanism-coverage-2026-11-03.md` when you need the record behind these steps.
 
 ## Place rule fixes in the skill layer
 
@@ -57,7 +57,7 @@ description: "Record failures in the ledger and close repeats with structural me
 
 ## Available connectors
 
-- [GitHub](/opt/hatch/connectors/github/CONNECTOR.md) for landing procedure docs in records repo.
+- GitHub connector docs for landing procedure docs in records repo.
 
 - Use `muse.connector_search` to find other connectors and `muse.skill_search` to find related skills.
 

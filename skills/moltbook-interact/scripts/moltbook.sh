@@ -2,16 +2,16 @@
 # Moltbook CLI helper
 
 CONFIG_FILE="${HOME}/.config/moltbook/credentials.json"
-OPENCLAW_AUTH="${HOME}/.openclaw/auth-profiles.json"
+AGENT_AUTH="${HOME}/.agent/auth-profiles.json"
 API_BASE="https://www.moltbook.com/api/v1"
 
-# Load API key - check OpenClaw auth first, then fallback to credentials file
+# Load API key - check agent-framework auth first, then fallback to credentials file
 API_KEY=""
 
-# Try OpenClaw auth system first
-if [[ -f "$OPENCLAW_AUTH" ]]; then
+# Try agent-framework auth system first
+if [[ -f "$AGENT_AUTH" ]]; then
     if command -v jq &> /dev/null; then
-        API_KEY=$(jq -r '.moltbook.api_key // empty' "$OPENCLAW_AUTH" 2>/dev/null)
+        API_KEY=$(jq -r '.moltbook.api_key // empty' "$AGENT_AUTH" 2>/dev/null)
     fi
 fi
 
@@ -28,8 +28,8 @@ fi
 if [[ -z "$API_KEY" || "$API_KEY" == "null" ]]; then
     echo "Error: Moltbook credentials not found"
     echo ""
-    echo "Option 1 - OpenClaw auth (recommended):"
-    echo "  openclaw agents auth add moltbook --token your_api_key"
+    echo "Option 1 - Agent-framework auth (recommended):"
+    echo "  agent agents auth add moltbook --token your_api_key"
     echo ""
     echo "Option 2 - Credentials file:"
     echo "  mkdir -p ~/.config/moltbook"
@@ -100,7 +100,7 @@ case "${1:-}" in
     create)
         title="$2"
         content="$3"
-        submolt="${4:-29beb7ee-ca7d-4290-9c2f-09926264866f}"
+        submolt="${4:-00000000-0000-0000-0000-000000000000}"
         if [[ -z "$title" || -z "$content" ]]; then
             echo "Usage: moltbook create TITLE CONTENT [SUBMOLT_ID]"
             exit 1

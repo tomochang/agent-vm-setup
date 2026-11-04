@@ -201,7 +201,7 @@ def digest(result):
         lines.append(f'  - (プロモーション {gm.get("promotions_omitted", 0)} 件は省略)')
     gh = section('GitHub', 'github')
     if gh is not None:
-        lines.append(f' clawd {len(gh["commits"])} commit:')
+        lines.append(f' records {len(gh["commits"])} commit:')
         lines += _commit_lines(gh['commits'])
         for r in gh.get('local_repos', []):
             lines.append(f' {r["repo"]} {len(r["commits"])} commit:')

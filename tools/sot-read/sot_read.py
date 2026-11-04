@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""C3 SoT section reader: read clawd's human todo SoT efficiently.
+"""C3 SoT section reader: read the records repo's human todo SoT efficiently.
 
-Boundary rule (determined 2026-11-02 by inspecting the real
-~/workspace/clawd/private/todo_log.md, 279,412 bytes):
+Boundary rule (determined 2026-11-02 by inspecting
+~/workspace/records/private/todo_log.md):
   - Item sections are headed by a markdown heading whose text IS the item
-    id, e.g. `## sch-1105-tawa`, `## sch-1010-manila`, `## kawanaka-fund`.
+    id, e.g. `## sch-1105-tawa`, `## sch-1010-manila`, `## example-fund`.
   - A section may contain deeper sub-headings (e.g. `### 2026-10-17 ...`
     dated entries under `## sch-1010-manila`); those belong to the section.
   - Archived items moved on 2026-10-28 appear as one level deeper:
@@ -22,8 +22,8 @@ FALLBACK message on stderr telling the caller to do a full read. It never
 prints the whole log for a section request.
 
 Usage:
-  sot_read.py full [--file PATH]          # default: clawd/private/todo.md
-  sot_read.py log <item-id> [--file PATH] # default: clawd/private/todo_log.md
+  sot_read.py full [--file PATH]          # default: records/private/todo.md
+  sot_read.py log <item-id> [--file PATH] # default: records/private/todo_log.md
 
 `full` writes the file byte-for-byte to stdout and its sha256 + byte
 count to stderr. Python 3 stdlib only.
@@ -34,7 +34,7 @@ import re
 import sys
 
 import os
-RECORDS_DIR = os.environ.get("RECORDS_DIR", os.path.expanduser("~/workspace/clawd"))
+RECORDS_DIR = os.environ.get("RECORDS_DIR", os.path.expanduser("~/workspace/records"))
 DEFAULT_TODO = os.environ.get("TODO_FILE", os.path.join(RECORDS_DIR, "private", "todo.md"))
 DEFAULT_LOG = os.environ.get("TODO_LOG_FILE", os.path.join(RECORDS_DIR, "private", "todo_log.md"))
 

@@ -2,7 +2,7 @@
 """spend_governor — persistent spend accounting + kill-switch verdict
 for the resident agent's own automated work.
 
-Pattern: the "leash" spend governor (research/mofu-vs-vanilla,
+Pattern: the "leash" spend governor (research/agent-vs-vanilla,
 sources/leash-spend-governor.md): an agent's in-memory step/budget
 counter resets on restart, so the accounting must be derived from a
 durable ledger and checked before heavy work runs, not after the fact.

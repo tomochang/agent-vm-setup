@@ -115,7 +115,7 @@ receipts/
 OPERATOR-COMPANYで決済した領収書は、以下のメールアドレスに転送することでカード決済に自動紐付けできる:
 
 ```
-94b43e74-b63c-4218-8384-55bde30d3b81_xwkuu@mail.operator-company.example
+00000000-0000-0000-0000-000000000000@mail.example.com
 ```
 
 ### 推奨ワークフロー

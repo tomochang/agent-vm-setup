@@ -25,13 +25,13 @@ description: "Settle a todo entry's outcome against Beeper, Google Calendar and 
 
 - Execute the cleanup in the main chat only after the operator's OK, and land it through the gates.
 
-- Read the full procedure in records repo `docs/infra/mofu-improvement-scout-2026-11-03.md` when you need the record behind these steps.
+- Read the full procedure in records repo `docs/infra/improvement-scout-2026-11-03.md` when you need the record behind these steps.
 
 ## Available connectors
 
-- [Gmail](/opt/hatch/connectors/gmail/CONNECTOR.md) for confirmations and cancellations.
+- Gmail connector docs for confirmations and cancellations.
 
-- [Google Calendar](/opt/hatch/connectors/google_calendar/CONNECTOR.md) for the events around an entry's dates.
+- Google Calendar connector docs for the events around an entry's dates.
 
 - Use `muse.connector_search` to find other connectors and `muse.skill_search` to find related skills.
 

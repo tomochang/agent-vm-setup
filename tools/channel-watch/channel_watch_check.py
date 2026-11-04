@@ -4,7 +4,7 @@ enabled reply watcher, so replies never pile up unread until the operator relays
 them by hand.
 
 Born 2026-11-04 (failure ledger: counterpart-reply-not-watched, 3 misses in
-one day on the a counterpart channel). The sora-watch hook fixed that one channel; this
+one day on the a counterpart channel). The counterpart-watch hook fixed that one channel; this
 check is the self-recognition layer: it compares the registry of work
 channels (where a counterpart's reply carries work) against the hook
 definitions on disk, and fails when an active channel's watcher is missing
@@ -12,7 +12,7 @@ or disabled.
 
 Registry rule: when a work thread is opened on a new counterpart/agent
 channel, add the channel + its watcher hook here in the same work block
-(see clawd docs/infra/mofu-sora-watch-2026-11-04.md).
+(see records docs/infra/counterpart-watch-2026-11-04.md).
 
 Exit 0 = all active channels watched (or Beeper unreachable — the liveness
 check owns that failure). Exit 1 = at least one FAIL line.

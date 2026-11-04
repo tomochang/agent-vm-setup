@@ -20,7 +20,7 @@ from optimizer import (
     detect_schedule_conflicts,
     detect_commented_jobs,
     detect_missing_scripts,
-    parse_openclaw_cron,
+    parse_agent_cron,
 )
 
 
@@ -230,7 +230,7 @@ class TestGenerateOptimizationReport(unittest.TestCase):
         self.assertIn("schedule_conflicts", report)
         self.assertIn("commented_jobs", report)
         self.assertIn("missing_scripts", report)
-        self.assertIn("openclaw_issues", report)
+        self.assertIn("agent_issues", report)
         self.assertIn("suggestions", report)
         self.assertIn("total_issues", report)
 
@@ -247,7 +247,7 @@ class TestGenerateOptimizationReport(unittest.TestCase):
         self.assertIn("集中", suggestion_texts)
 
 
-class TestParseOpenclawCron(unittest.TestCase):
+class TestParseAgentCron(unittest.TestCase):
     def test_parse_valid_config(self):
         config = {
             "cron": [
@@ -257,23 +257,23 @@ class TestParseOpenclawCron(unittest.TestCase):
         }
         with patch("builtins.open", unittest.mock.mock_open(read_data=json.dumps(config))):
             with patch("os.path.exists", return_value=True):
-                result = parse_openclaw_cron("/fake/openclaw.json")
+                result = parse_agent_cron("/fake/agent.json")
         self.assertEqual(len(result["jobs"]), 2)
         self.assertEqual(result["jobs"][0]["task"], "check-inbox")
 
     def test_parse_missing_file(self):
         with patch("os.path.exists", return_value=False):
-            result = parse_openclaw_cron("/fake/openclaw.json")
+            result = parse_agent_cron("/fake/agent.json")
         self.assertIsNone(result)
 
     def test_parse_no_cron_key(self):
         config = {"other_key": "value"}
         with patch("builtins.open", unittest.mock.mock_open(read_data=json.dumps(config))):
             with patch("os.path.exists", return_value=True):
-                result = parse_openclaw_cron("/fake/openclaw.json")
+                result = parse_agent_cron("/fake/agent.json")
         self.assertEqual(result["jobs"], [])
 
-    def test_detect_disabled_openclaw_jobs(self):
+    def test_detect_disabled_agent_jobs(self):
         config = {
             "cron": [
                 {"schedule": "0 * * * *", "task": "active-job", "enabled": True},
@@ -282,7 +282,7 @@ class TestParseOpenclawCron(unittest.TestCase):
         }
         with patch("builtins.open", unittest.mock.mock_open(read_data=json.dumps(config))):
             with patch("os.path.exists", return_value=True):
-                result = parse_openclaw_cron("/fake/openclaw.json")
+                result = parse_agent_cron("/fake/agent.json")
         disabled = [j for j in result["jobs"] if not j.get("enabled", True)]
         self.assertEqual(len(disabled), 1)
         self.assertEqual(disabled[0]["task"], "disabled-job")

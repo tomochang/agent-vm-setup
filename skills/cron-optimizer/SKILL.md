@@ -16,8 +16,8 @@ python3 scripts/optimizer.py
 # 参照スクリプトの存在チェックも行う
 python3 scripts/optimizer.py --check-scripts
 
-# OpenClawのcron設定も分析
-python3 scripts/optimizer.py --openclaw-config /path/to/openclaw.json
+# エージェントフレームワークのcron設定も分析
+python3 scripts/optimizer.py --agent-config /path/to/agent.json
 
 # 集中検出の閾値を変更（デフォルト: 4）
 python3 scripts/optimizer.py --threshold 3
@@ -35,7 +35,7 @@ python3 scripts/optimizer.py --dry-run
 | スケジュール集中検出 | 同時間帯にジョブが集中していないか（デフォルト閾値: 4件） |
 | 無効ジョブ検出 | コメントアウト済みcronエントリを検出 |
 | スクリプト不在検出 | `--check-scripts` 時、参照ファイルの存在チェック |
-| OpenClaw分析 | `openclaw.json` のcronセクションを分析（無効ジョブ等） |
+| エージェント分析 | `agent.json` のcronセクションを分析（無効ジョブ等） |
 | 最適化提案 | 各問題に対して日本語の具体的な提案を生成 |
 
 ## テスト

@@ -8,7 +8,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 LOG_FILE="$SCRIPT_DIR/logs/reminder.log"
-DISCORD_CHANNEL="channel:1465129618645192707"  # Clawdbot通知チャンネル
+DISCORD_CHANNEL="channel:1465129618645192707"  # Recordsbot通知チャンネル
 
 mkdir -p "$SCRIPT_DIR/logs"
 
@@ -29,18 +29,18 @@ MESSAGE="📋 **Uber領収書ダウンロード**
 今月分（${YEAR}/${MONTH}）のUber領収書をダウンロードしますか？
 
 \`\`\`
-~/clawd/skills/uber-receipts/run.sh
+~/records/skills/uber-receipts/run.sh
 \`\`\`
 
 Chrome起動 → ログイン待ち → ダウンロード まで自動で進みます。"
 
-# clawdbotで送信
-if command -v clawdbot &> /dev/null; then
+# recordsbotで送信
+if command -v recordsbot &> /dev/null; then
     log "Sending Discord notification..."
-    clawdbot message send --channel discord --target "$DISCORD_CHANNEL" --message "$MESSAGE" 2>&1 | tee -a "$LOG_FILE"
+    recordsbot message send --channel discord --target "$DISCORD_CHANNEL" --message "$MESSAGE" 2>&1 | tee -a "$LOG_FILE"
     log "Notification sent"
 else
-    log "WARNING: clawdbot not found, falling back to echo"
+    log "WARNING: recordsbot not found, falling back to echo"
     echo "$MESSAGE"
 fi
 

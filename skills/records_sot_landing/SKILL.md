@@ -1,5 +1,5 @@
 ---
-name: clawd_sot_landing
+name: records_sot_landing
 description: "Mirror real-world facts into records repo and land them through the gates in the same run, used whenever you record a booking, cancellation, completion or decision or classify a todo matter."
 ---
 
@@ -39,9 +39,9 @@ description: "Mirror real-world facts into records repo and land them through th
 
 ## Available connectors
 
-- [GitHub](/opt/hatch/connectors/github/CONNECTOR.md) for work in the records repo repository.
+- GitHub connector docs for work in the records repo repository.
 
-- [Google Calendar](/opt/hatch/connectors/google_calendar/CONNECTOR.md) for the booking events this skill requires.
+- Google Calendar connector docs for the booking events this skill requires.
 
 - Use `muse.connector_search` to find other connectors and `muse.skill_search` to find related skills.
 

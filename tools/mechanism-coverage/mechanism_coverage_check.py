@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """mechanism_coverage_check — every mechanism the resident agent operates must be
-recorded in clawd (the SoT), not only in this VM.
+recorded in records (the SoT), not only in this VM.
 
 Born from the 2026-11-03 factory-handoff miss: a new repo + protocol was
 built and already operating (ack exchanged, cycle test run, a real task
@@ -11,16 +11,16 @@ a machine check, because doc_coverage_check only covers scripts in the
 tool directories — a new repository is not a script.
 
 Coverage (default-deny):
-  - every git repository directly under ~/workspace, except `clawd`
-    itself (the SoT) and worktree checkouts (~/clawd-wt/*)
+  - every git repository directly under ~/workspace, except `records`
+    itself (the SoT) and worktree checkouts (~/records-wt/*)
   - every topic dir under ~/workspace/research that holds a spec.md,
     SPEC.md or trial.md (research that turned into a mechanism)
   - every topic dir under ~/workspace/research that holds a finished
     deliverable (digest.json, digest.html or report.html) — added
-    2026-11-03 after the mofu-vs-vanilla imozuru research was presented
-    to the operator before it was landed to clawd (failure-ledger signature
+    2026-11-03 after the agent-vs-vanilla imozuru research was presented
+    to the operator before it was landed to records (failure-ledger signature
     `research-deliverable-not-landed`, the second strike in the
-    mechanism-without-clawd-record family)
+    mechanism-without-records-record family)
 A mechanism target is covered when its name appears in at least one
 document under origin/main:docs/infra/. A deliverable topic is covered
 when research/<topic>/ itself exists in origin/main (the deliverable IS
@@ -38,7 +38,7 @@ from pathlib import Path
 
 HOME = Path.home()
 WORKSPACE = Path(os.environ.get("AGENT_VM_ROOT", str(HOME / "workspace")))
-CLAWD = Path(os.environ.get("RECORDS_DIR", str(WORKSPACE / "clawd")))
+RECORDS = Path(os.environ.get("RECORDS_DIR", str(WORKSPACE / "records")))
 
 EXCLUSIONS = {
     # name: reason (each must also appear in the procedure doc)
@@ -53,7 +53,7 @@ def targets():
     mechanisms = {}
     deliverables = {}
     for child in sorted(WORKSPACE.iterdir()):
-        if child.name in ("clawd", "clawd-wt"):
+        if child.name in ("records", "records-wt"):
             continue
         if (child / ".git").exists():
             mechanisms[child.name] = f"repo {child}"
@@ -71,7 +71,7 @@ def targets():
 
 def covered(name):
     r = subprocess.run(
-        ["git", "-C", str(CLAWD), "grep", "-F", "-l", name, "origin/main", "--", "docs/infra/"],
+        ["git", "-C", str(RECORDS), "grep", "-F", "-l", name, "origin/main", "--", "docs/infra/"],
         capture_output=True, text=True,
     )
     return r.returncode == 0 and bool(r.stdout.strip())
@@ -79,7 +79,7 @@ def covered(name):
 
 def landed_research(name):
     r = subprocess.run(
-        ["git", "-C", str(CLAWD), "ls-tree", "origin/main", "--", f"research/{name}"],
+        ["git", "-C", str(RECORDS), "ls-tree", "origin/main", "--", f"research/{name}"],
         capture_output=True, text=True,
     )
     return r.returncode == 0 and bool(r.stdout.strip())
@@ -87,7 +87,7 @@ def landed_research(name):
 
 def main():
     stale = False
-    r = subprocess.run(["git", "-C", str(CLAWD), "fetch", "-q", "origin"],
+    r = subprocess.run(["git", "-C", str(RECORDS), "fetch", "-q", "origin"],
                        capture_output=True, text=True)
     if r.returncode != 0:
         stale = True

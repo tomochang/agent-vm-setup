@@ -2,7 +2,7 @@
 cron-optimizer — cronジョブの棚卸し・最適化スクリプト
 
 Usage:
-    python3 scripts/optimizer.py [--check-scripts] [--openclaw-config PATH] [--dry-run]
+    python3 scripts/optimizer.py [--check-scripts] [--agent-config PATH] [--dry-run]
 
 安全ポリシー: cronの変更は提案のみ。自動変更しない。
 """
@@ -222,12 +222,12 @@ def detect_missing_scripts(jobs: list[CronJob]) -> list[dict[str, Any]]:
 
 
 # ---------------------------------------------------------------------------
-# OpenClaw config parsing
+# Agent-framework config parsing
 # ---------------------------------------------------------------------------
 
-def parse_openclaw_cron(config_path: str) -> dict[str, Any] | None:
+def parse_agent_cron(config_path: str) -> dict[str, Any] | None:
     """
-    Parse an openclaw.json file and return its cron section.
+    Parse an agent.json file and return its cron section.
 
     Returns None if the file doesn't exist.
     Returns {"jobs": [...]} (empty list if no "cron" key).
@@ -245,13 +245,13 @@ def parse_openclaw_cron(config_path: str) -> dict[str, Any] | None:
     return {"jobs": cron_jobs}
 
 
-def detect_openclaw_issues(openclaw_result: dict[str, Any] | None) -> list[dict[str, Any]]:
-    """Detect issues in OpenClaw cron configuration."""
-    if openclaw_result is None:
+def detect_agent_issues(agent_result: dict[str, Any] | None) -> list[dict[str, Any]]:
+    """Detect issues in agent-framework cron configuration."""
+    if agent_result is None:
         return []
 
     issues = []
-    for job in openclaw_result.get("jobs", []):
+    for job in agent_result.get("jobs", []):
         if not job.get("enabled", True):
             issues.append({"type": "disabled", "job": job})
     return issues
@@ -266,7 +266,7 @@ def generate_optimization_report(
     conflicts: list[dict[str, Any]],
     commented: list[dict[str, Any]],
     missing: list[dict[str, Any]],
-    openclaw_issues: list[dict[str, Any]],
+    agent_issues: list[dict[str, Any]],
 ) -> dict[str, Any]:
     """Compile all findings into a structured report with suggestions."""
     suggestions: list[str] = []
@@ -297,23 +297,23 @@ def generate_optimization_report(
                 f"スクリプト不在: '{m['script']}' が見つかりません。ジョブを確認してください。"
             )
 
-    if openclaw_issues:
-        for issue in openclaw_issues:
+    if agent_issues:
+        for issue in agent_issues:
             if issue["type"] == "disabled":
                 task = issue["job"].get("task", "unknown")
                 suggestions.append(
-                    f"OpenClaw無効ジョブ: '{task}' が無効化されています。不要なら設定から削除してください。"
+                    f"エージェント無効ジョブ: '{task}' が無効化されています。不要なら設定から削除してください。"
                 )
 
-    total = len(duplicates) + len(conflicts) + len(commented) + len(missing) + len(openclaw_issues)
+    total = len(duplicates) + len(conflicts) + len(commented) + len(missing) + len(agent_issues)
 
     return {
-        "issues": duplicates + conflicts + commented + missing + openclaw_issues,
+        "issues": duplicates + conflicts + commented + missing + agent_issues,
         "duplicates": duplicates,
         "schedule_conflicts": conflicts,
         "commented_jobs": commented,
         "missing_scripts": missing,
-        "openclaw_issues": openclaw_issues,
+        "agent_issues": agent_issues,
         "suggestions": suggestions,
         "total_issues": total,
     }
@@ -372,9 +372,9 @@ def _print_report(report: dict[str, Any], dry_run: bool) -> None:
         for m in report["missing_scripts"]:
             print(f"  • {m['script']}")
 
-    if report["openclaw_issues"]:
-        print(f"\n[OpenClaw無効ジョブ] {len(report['openclaw_issues'])} 件")
-        for issue in report["openclaw_issues"]:
+    if report["agent_issues"]:
+        print(f"\n[エージェント無効ジョブ] {len(report['agent_issues'])} 件")
+        for issue in report["agent_issues"]:
             print(f"  • {issue['job'].get('task', 'unknown')}")
 
     print("\n[最適化提案]")
@@ -395,10 +395,10 @@ def main() -> None:
         help="参照スクリプトの存在をチェックする",
     )
     parser.add_argument(
-        "--openclaw-config",
+        "--agent-config",
         metavar="PATH",
         default=None,
-        help="OpenClawのcron設定JSONファイルパス（例: /etc/openclaw.json）",
+        help="エージェントフレームワークのcron設定JSONファイルパス（例: /etc/agent.json）",
     )
     parser.add_argument(
         "--dry-run",
@@ -425,16 +425,16 @@ def main() -> None:
     commented = detect_commented_jobs(jobs)
     missing = detect_missing_scripts(jobs) if args.check_scripts else []
 
-    # 3. OpenClaw設定
-    openclaw_result = None
-    openclaw_issues: list[dict[str, Any]] = []
-    if args.openclaw_config:
-        openclaw_result = parse_openclaw_cron(args.openclaw_config)
-        openclaw_issues = detect_openclaw_issues(openclaw_result)
+    # 3. エージェントフレームワーク設定
+    agent_result = None
+    agent_issues: list[dict[str, Any]] = []
+    if args.agent_config:
+        agent_result = parse_agent_cron(args.agent_config)
+        agent_issues = detect_agent_issues(agent_result)
 
     # 4. レポート生成
     report = generate_optimization_report(
-        duplicates, conflicts, commented, missing, openclaw_issues
+        duplicates, conflicts, commented, missing, agent_issues
     )
 
     # 5. 出力

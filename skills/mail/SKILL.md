@@ -44,7 +44,7 @@ description: Gmail未読メールを分類・返信案作成・送信し、後�
 
 - **ツール**: `gog` CLI（gogcli）
 - **アカウント**: `operator-secondary@example.com`
-- **VPS実行**: `GOG_KEYRING_PASSWORD=$GOG_KEYRING_PASSWORD /home/openclaw/bin/gog <cmd> --account operator-secondary@example.com`
+- **VPS実行**: `GOG_KEYRING_PASSWORD=$GOG_KEYRING_PASSWORD gog <cmd> --account operator-secondary@example.com`
 - **スクリプト**: `scripts/mail-draft.sh`, `scripts/mail-send.sh`
 - **時刻**: すべてJST表記（UTC禁止）
 
@@ -58,7 +58,7 @@ description: Gmail未読メールを分類・返信案作成・送信し、後�
 
 ```bash
 # 1st: 社内・重要メール（サポート除外）
-GOG_KEYRING_PASSWORD=$GOG_KEYRING_PASSWORD /home/openclaw/bin/gog gmail search \
+GOG_KEYRING_PASSWORD=$GOG_KEYRING_PASSWORD gog gmail search \
   "newer_than:1d -label:OPERATOR-COMPANY-Support -category:promotions -category:social -category:forums -category:updates -in:trash" \
   --max 30 --json --account operator-secondary@example.com
 

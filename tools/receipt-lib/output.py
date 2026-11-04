@@ -8,7 +8,7 @@ from pathlib import Path
 from .models import PaymentMethod, Receipt, ReceiptSource
 
 # デフォルトのレシート格納先
-DEFAULT_RECEIPTS_DIR = Path.home() / "clawd" / "receipts"
+DEFAULT_RECEIPTS_DIR = Path.home() / "records" / "receipts"
 
 
 def organize_receipt(
@@ -22,7 +22,7 @@ def organize_receipt(
 
     Args:
         receipt: 配置対象のレシート
-        receipts_dir: ベースディレクトリ (デフォルト: ~/clawd/receipts)
+        receipts_dir: ベースディレクトリ (デフォルト: ~/records/receipts)
         copy: True=コピー, False=移動
 
     Returns:

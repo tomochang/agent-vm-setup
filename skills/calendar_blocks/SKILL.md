@@ -19,11 +19,11 @@ description: "Move a calendar event's linked travel blocks with it and verify co
 
 - Run `the setup tools directory/calendar_block.py <eventId>` again after patching and confirm the block runs continuously.
 
-- Read the full procedure in records repo `docs/infra/mofu-calendar-block-2026-11-03.md` when you need the record behind these steps.
+- Read the full procedure in records repo `docs/infra/calendar-block-2026-11-03.md` when you need the record behind these steps.
 
 ## Available connectors
 
-- [Google Calendar](/opt/hatch/connectors/google_calendar/CONNECTOR.md) for reading and patching the events.
+- Google Calendar connector docs for reading and patching the events.
 
 - Use `muse.connector_search` to find other connectors and `muse.skill_search` to find related skills.
 

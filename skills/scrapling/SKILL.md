@@ -26,7 +26,7 @@ description: Scraplingでウェブサイトをスクレイピングする。web_
 ### venv有効化（必須）
 
 ```bash
-source /home/openclaw/.openclaw/workspace/tools/scrapling-env/bin/activate
+source $HOME/workspace/tools/scrapling-env/bin/activate
 ```
 
 ### Fetcher選択基準

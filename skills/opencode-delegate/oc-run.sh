@@ -18,9 +18,9 @@ done
 DIR="$(cd "$DIR" 2>/dev/null && pwd -P)" || { echo "oc-run: no such dir" >&2; exit 2; }
 
 # The provider sees every file opencode reads: never run on the private repo or the whole home dir.
-CLAWD="$(cd "$HOME/clawd" 2>/dev/null && pwd -P || echo "$HOME/clawd")"
+RECORDS="$(cd "$HOME/records" 2>/dev/null && pwd -P || echo "$HOME/records")"
 HOMEP="$(cd "$HOME" && pwd -P)"
-case "$DIR/" in "$CLAWD"/*) echo "oc-run: refusing to run inside $CLAWD (private data)" >&2; exit 2 ;; esac
+case "$DIR/" in "$RECORDS"/*) echo "oc-run: refusing to run inside $RECORDS (private data)" >&2; exit 2 ;; esac
 [ "$DIR" = "$HOMEP" ] && { echo "oc-run: refusing to run in \$HOME; cd into a project dir" >&2; exit 2; }
 
 args=(run --dir "$DIR" -m "$MODEL")

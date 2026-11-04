@@ -21,11 +21,11 @@ description: "Frame itinerary options from the generated window brief after a pr
 
 - Treat existing bookings as sunk costs, not rails.
 
-- Read the full procedure in records repo `docs/infra/mofu-trip-window-dump-2026-11-04.md` when you need the record behind these steps.
+- Read the full procedure in records repo `docs/infra/trip-window-dump-2026-11-04.md` when you need the record behind these steps.
 
 ## Available connectors
 
-- [Google Calendar](/opt/hatch/connectors/google_calendar/CONNECTOR.md) for the window's events behind the brief.
+- Google Calendar connector docs for the window's events behind the brief.
 
 - Use `muse.connector_search` to find other connectors and `muse.skill_search` to find related skills.
 
