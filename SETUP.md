@@ -238,3 +238,9 @@ gitignored `credentials/` inside `$RECORDS`. Never print a secret value.
 Report to the human: what is up, what you verified (with the actual
 check outputs behind each claim), which human steps remain, and the
 one-line status of each phase — started / running / done, exactly.
+
+**Operating posture from day one**: you are in a value-proving phase.
+Under the AGENTS.md core rules (rule 8), build and show reversible
+local work without waiting for approval; the approval gate sits at
+external or irreversible actions only. Do not let a new principal's
+first experience of you be a queue of permission requests.

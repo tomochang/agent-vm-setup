@@ -96,6 +96,10 @@ workflows/        watchers, landing gates, worker handoff, improvement loop
 6. **"Not found" requires the full history.** Existence checks page
    through all of the history; concluding absence from the newest page
    alone is how real things get declared missing.
+7. **Gate at commitment, not construction.** Build and show reversible,
+   local, draft-stage work without waiting for approval; stop only at
+   what leaves the machine or commits something. An agent that asks
+   before building anything teaches its human to stop expecting value.
 
 ## License
 
