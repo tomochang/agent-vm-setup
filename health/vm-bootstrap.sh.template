@@ -1,0 +1,41 @@
+#!/bin/bash
+# vm-bootstrap.sh — idempotently restore everything a VM replacement
+# wipes, so the health loop can self-heal. Called by the loop after a
+# failed bootstrap-check; safe to run any time. Single instance (flock).
+# Principles:
+#   - canonical copies live in the persistent home / records repo;
+#     volatile paths (/root, /usr) get mirrors, never the originals.
+#   - hand-started GUI processes (Beeper) die with the VM: relaunch.
+exec 9>/tmp/vm-bootstrap.lock
+flock -n 9 || { echo "vm-bootstrap: another instance is running"; exit 0; }
+
+H="$HOME"
+FAIL=0
+log() { echo "bootstrap: $*"; }
+
+# 1. mirrors into volatile paths (examples — adapt to your gate/tooling)
+mkdir -p /root/.ssh && chmod 700 /root/.ssh
+[ -f "$H/.ssh/config" ] && cp "$H/.ssh/config" /root/.ssh/config && chmod 600 /root/.ssh/config
+if [ -f "$H/.config/gh/hosts.yml" ]; then
+  mkdir -p /root/.config/gh
+  cp "$H/.config/gh/hosts.yml" /root/.config/gh/hosts.yml
+  chmod 600 /root/.config/gh/hosts.yml
+  log "gh mirror OK"
+fi
+
+# 2. temp dir on the big disk if /tmp is a small tmpfs (adapt size/paths)
+mkdir -p "$H/workspace/big-tmp"
+
+# 3. Beeper relaunch (idempotent launcher leaves a running instance alone)
+if pgrep -f '[b]eepertexts' >/dev/null 2>&1; then
+  log "beeper: already running"
+elif [ -x "$H/workspace/beeper-diag/launch-beeper.sh" ]; then
+  if bash "$H/workspace/beeper-diag/launch-beeper.sh" >/dev/null 2>&1 && sleep 5 && pgrep -f '[b]eepertexts' >/dev/null 2>&1; then
+    log "beeper: relaunched OK"
+  else
+    log "beeper: relaunch FAILED"
+    FAIL=1
+  fi
+fi
+
+exit $FAIL

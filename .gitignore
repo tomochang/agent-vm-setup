@@ -1,0 +1,7 @@
+# Secrets never enter this repo — the patterns below guard the records
+# repo you create from these templates, too.
+credentials/
+*.token
+oauth.json
+*-credentials
+.env

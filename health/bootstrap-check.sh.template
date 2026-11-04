@@ -1,0 +1,35 @@
+#!/bin/bash
+# bootstrap-check.sh — report-only health check for the agent VM.
+# One line per invariant: OK / FAIL (required) / WARN (known-benign).
+# Exit 0 = all required OK. It reports; it never installs or fixes.
+# Adapt the lines to your VM; keep the idiom.
+fail=0
+ok()   { echo "OK   $*"; }
+bad()  { echo "FAIL $*"; fail=1; }
+warn() { echo "WARN $*"; }
+
+# --- tools (prefer $HOME installs: /usr and /root may be wiped) ---
+if command -v claude >/dev/null 2>&1 || [ -x "$HOME/.npm-global/bin/claude" ]; then ok "claude: present"; else bad "claude: MISSING (run vm-bootstrap)"; fi
+if command -v codex >/dev/null 2>&1; then ok "codex: present"; else bad "codex: MISSING"; fi
+if command -v gh >/dev/null 2>&1; then ok "gh: present"; else bad "gh: MISSING"; fi
+
+# --- auth/config that must live in the persistent home ---
+if [ -f "$HOME/.config/gh/hosts.yml" ]; then ok "gh auth file: present"; else bad "gh auth file: MISSING"; fi
+if [ -f "$HOME/.ssh/config" ]; then ok "ssh config: present"; else bad "ssh config: MISSING"; fi
+
+# --- Beeper: process up AND Desktop API answering with the stored token ---
+BEEPER_TOKEN_FILE="$HOME/records/credentials/beeper-token"   # adapt path
+if ! pgrep -f '[b]eepertexts' >/dev/null 2>&1; then
+  bad "beeper: process not running (run vm-bootstrap)"
+elif [ ! -f "$BEEPER_TOKEN_FILE" ]; then
+  bad "beeper: API token file missing — run beeper/oauth_setup.py"
+elif [ "$(curl -s -o /dev/null -m 5 -w '%{http_code}' -H "Authorization: Bearer $(cat "$BEEPER_TOKEN_FILE")" http://127.0.0.1:23373/v1/accounts)" = "200" ]; then
+  ok "beeper: process up, Desktop API answers 200 (read/send path works)"
+else
+  bad "beeper: Desktop API did not answer 200 (token expired? re-run beeper/oauth_setup.py)"
+fi
+
+# --- records repo present and clean-ish ---
+[ -d "$HOME/records/.git" ] && ok "records repo: present" || bad "records repo: MISSING"
+
+exit $fail
