@@ -1,0 +1,11 @@
+{
+  "business_hours": {"start": "09:00", "end": "18:00"},
+  "timezone": "Asia/Tokyo",
+  "avoid_morning": true,
+  "default_slot_duration_minutes": 60,
+  "buffer_rules": [
+    {"keyword": "bank", "before_minutes": 60, "after_minutes": 60},
+    {"keyword": "銀行", "before_minutes": 60, "after_minutes": 60}
+  ],
+  "exclude_weekends": true
+}

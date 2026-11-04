@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+# chat-watch — template: wake an agent when a counterpart posts in one
+# Beeper chat, so the operator never has to relay "they replied" by hand.
+# Polls the local Beeper Desktop API (read-only), filters to messages
+# NOT sent by the operator, dedupes by fingerprint in state.
+# Instantiate per chat: copy to <hook-id>-watch.sh and set WATCH_CHAT_ID,
+# WATCH_STATE_FILE, and OPERATOR_SENDER_PREFIX (see tools/watchers/README.md).
+# The worker that receives the WAKE payload must relay the posts verbatim:
+# no summary, no interpretation, no classification on the relay path.
+set -euo pipefail
+source "$HATCH_HOOK_RUNTIME"
+
+STATE_FILE="${WATCH_STATE_FILE:-$HOME/hooks/state/chat-watch.json}"
+mkdir -p "$HOME/hooks/state"
+
+RESULT=$(python3 - "$STATE_FILE" "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)" <<'PYEOF'
+import hashlib, json, os, sys, urllib.parse
+sys.path.insert(0, os.environ.get('BEEPER_API_DIR', os.path.join(sys.argv[2], 'beeper')))
+STATE = sys.argv[1]
+CHAT = __import__('os').environ.get('WATCH_CHAT_ID', '')
+OPERATOR_PREFIX = __import__('os').environ.get('OPERATOR_SENDER_PREFIX', '@operator')
+if not CHAT:
+    print('SILENT WATCH_CHAT_ID not set')
+    sys.exit(0)
+DRY = __import__('os').environ.get('HATCH_HOOK_DRY_RUN') == '1'
+
+try:
+    with open(STATE) as f:
+        seen = json.load(f).get('seen', [])
+except Exception:
+    seen = None  # first run ever
+
+try:
+    import beeper_api
+    data = beeper_api.get('/v1/chats/' + urllib.parse.quote(CHAT, safe='') + '/messages',
+                          params={'limit': 15})
+    items = data.get('items', [])
+except BaseException as e:  # beeper_api sys.exit()s on failure (2=unreachable, 3=auth)
+    print('SILENT beeper unreachable: ' + str(e)[:120])
+    sys.exit(0)
+
+def fp(m):
+    return hashlib.sha256(((m.get('timestamp') or '') + '|' + (m.get('text') or '')[:200]).encode()).hexdigest()[:16]
+
+posts = []
+for m in items:
+    sid = m.get('senderID') or ''
+    if sid.startswith(OPERATOR_PREFIX):
+        continue  # the operator's own messages are not news
+    if (m.get('text') or '').strip():
+        posts.append(m)
+fps = [fp(m) for m in items]
+
+if seen is None:
+    if not DRY:
+        with open(STATE, 'w') as f:
+            json.dump({'seen': fps}, f)
+    print('SILENT initialized watermark on first run')
+    sys.exit(0)
+
+new = [m for m in posts if fp(m) not in seen]
+if not DRY:
+    merged = list(dict.fromkeys(fps + seen))[:60]
+    with open(STATE, 'w') as f:
+        json.dump({'seen': merged}, f)
+
+if not new:
+    print('SILENT no new posts')
+    sys.exit(0)
+
+payload = {'posts': [{'ts': m.get('timestamp'), 'sender': m.get('senderName') or m.get('senderID'),
+                      'text': (m.get('text') or '')[:700]} for m in new[:5]],
+           'count': len(new)}
+print('WAKE ' + json.dumps(payload, ensure_ascii=False))
+PYEOF
+)
+
+case "$RESULT" in
+  WAKE\ *) wake "new post in watched chat" "${RESULT#WAKE }" ;;
+  *) silent "${RESULT#SILENT }" '{}' ;;
+esac

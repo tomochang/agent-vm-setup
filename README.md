@@ -72,7 +72,8 @@ health/           failure ledger + health-loop templates
 healthchecks/     dead man's switch pattern (ping wiring + judge)
 templates/        AGENTS.md core rules, coordination protocol, cron patterns
 todo/             the todo system: 3-line format, state model, the two jobs, format checker
-skills/           the skill system: loadable rule bodies + the skill-map pattern
+skills/           the skill system: 45 loadable rule bodies + the skill-map pattern (see skills/README.md index)
+tools/            operator tools: coverage checks, watchers, spend governor, receipt library (see tools/README.md)
 workflows/        watchers, landing gates, worker handoff, improvement loop
 ```
 
