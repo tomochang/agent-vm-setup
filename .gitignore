@@ -5,3 +5,5 @@ credentials/
 oauth.json
 *-credentials
 .env
+
+__pycache__/
