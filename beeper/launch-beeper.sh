@@ -11,6 +11,9 @@
 #                    URL captured at launch time goes stale (HTTP 407) and
 #                    Beeper sign-in fails with a generic error.
 # Every step is idempotent; safe to call from a health loop.
+# NOTE on killing Beeper: never write `pkill -f beepertexts` in a shell
+# you care about — the pattern matches your own command line and kills
+# your shell too. Use the bracket form: pkill -f '[b]eepertexts'.
 set -u
 export DISPLAY=:99
 APP_DIR="${BEEPER_APP_DIR:-$HOME/Applications/squashfs-root}"

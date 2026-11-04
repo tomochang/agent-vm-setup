@@ -28,6 +28,12 @@ A read-only consumer on another machine can poll check states via the
 API (e.g. every 15 min) and alert on transitions — an independent
 witness that does not share the pinging VM's fate.
 
+The judge must treat **"the API/auth is failing"** and **"the target
+check is down"** as different states and report them differently: a
+401 (e.g. after a key rotation) is a problem with the judge's own
+access, not evidence that the target died. Conflating the two turns a
+credential errand into a false outage alarm.
+
 ## Hard-won warning
 
 **Rotating the read-only API key revokes the old one everywhere.**

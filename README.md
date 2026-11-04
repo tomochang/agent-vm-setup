@@ -84,6 +84,9 @@ templates/        AGENTS.md core rules, coordination protocol, cron patterns
 5. **Secrets live in exactly one place** — a 600-permission file on the
    VM, never in git, never in chat. Hand a secret to another agent only
    encrypted to a key they generated for that purpose.
+6. **"Not found" requires the full history.** Existence checks page
+   through all of the history; concluding absence from the newest page
+   alone is how real things get declared missing.
 
 ## License
 

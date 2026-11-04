@@ -49,10 +49,9 @@ def emit(verdict, code):
 def main():
     if probe():
         return emit("alive", 0)
-    # Launch DETACHED: launch-beeper.sh stays in the foreground for as
-    # long as Beeper runs, so waiting on it would never return (and a
-    # timeout kill takes the app down with it). Fire it with its own
-    # session and output to a log, then poll the API.
+    # Fire the launcher detached and poll the API: the launcher itself
+    # returns once Beeper is started (it backgrounds the app), but its
+    # exit alone is not proof the API is up — the poll below is.
     try:
         launch_log = open(HERE / "beeper-launch.log", 'a')
         subprocess.Popen(['bash', str(LAUNCH)], stdout=launch_log,
