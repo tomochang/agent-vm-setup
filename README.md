@@ -8,7 +8,9 @@ Built from a working system (in daily use since January 2026) and packaged
 so that **a Muse can set it up almost non-stop**: follow
 [SETUP.md](SETUP.md) top to bottom. The human starts by pasting the
 [KICKOFF.md](KICKOFF.md) prompt to the setting-up agent — it carries
-the standing instructions the runbook assumes. The only stops are the sign-in steps
+the standing instructions the runbook assumes. A Japanese version,
+pre-filled by the author for a beginner adopter, is
+[KICKOFF.ja.md](KICKOFF.ja.md). The only stops are the sign-in steps
 that are human by design (passkeys, OAuth consent, Beeper's device
 verification) — everything else is scripted or scriptable.
 
@@ -53,7 +55,11 @@ Supporting mechanisms (in `health/` and `templates/`):
 - Accounts: Muse (with the agent platform), GitHub, Beeper,
   healthchecks.io (free tier is enough), plus Claude Code and Codex
   subscriptions for the builder/reviewer roles.
-- About 30–60 minutes, of which the human part is a handful of sign-ins.
+- About 30–60 minutes on the full profile, of which the human part
+  is a handful of sign-ins. A beginner on the minimal profile
+  (SETUP.md, *Profiles*) should expect 75–120 minutes of their own
+  time across 3–4 sittings, most of it one live sitting with the
+  author present.
 
 ## Human-only steps (by design)
 

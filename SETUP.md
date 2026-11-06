@@ -15,6 +15,23 @@ gitignored `credentials/` inside `$RECORDS`. Never print a secret value.
 it, ask for it once — it carries standing instructions (posture,
 reporting, persistence) that the phases below assume.
 
+## Profiles — read this first
+
+The full shape below serves an operator running several agents and
+machines. A first-time, single-agent adopter runs the **minimal**
+profile instead — a dual review of this package against a real
+beginner adopter found the full shape stalls them between Phases 1
+and 3:
+
+- **minimal**: Phases 0, 1-local, 3, 4 (author-hosted option), 5, 6,
+  then Phase 8 (the flagship). Phases 2 and 7 wait until a real need
+  appears. The owner's own time is roughly 75–120 minutes across
+  3–4 sittings, most of it one live sitting with the author present
+  (Phase 3).
+- **full**: all phases in order. The cover estimate (30–60 minutes)
+  assumes this profile's sign-ins go smoothly with the owner at a
+  laptop.
+
 ## Phase 0 — Environment survey
 
 - These VMs are single-tenant agent boxes: the setup and the health
@@ -63,6 +80,17 @@ reporting, persistence) that the phases below assume.
 - **Verify**: a trivial change lands and `git pull` on the main clone
   shows it.
 
+**Minimal profile — Phase 1-local instead.** Skip GitHub for now:
+`git init` the records repo inside `$HOME` with the same skeleton
+and `.gitignore`, and schedule a nightly archive of it to the
+owner's cloud drive (most agent platforms already have a drive
+connector, and a beginner owner is usually already signed in to
+it). Version history and off-machine backup are weaker than a
+hosted repo — accept that trade consciously, and graduate to the
+hosted form when a second machine or agent appears. What must NOT
+be weakened: the skeleton, the gitignore, and the branch
+discipline.
+
 ## Phase 2 — Builder and reviewer sign-ins
 
 1. Install Claude Code into a persistent prefix so a VM replacement
@@ -108,8 +136,8 @@ reporting, persistence) that the phases below assume.
    python3-pip`; on PEP 668 systems the `--target` form is the one
    that works). Then, via `cdp.py`: read the email-code field state
    and the SAS emoji sequence out of the DOM, relay them to the human
-   over chat, and type the code they give you back. Wait for initial
-   sync to finish.
+   over chat, and type back the code they return under *Credential
+   and code hand-over* below. Wait for initial sync to finish.
 4. Issue the Desktop API token with the canonical script:
    `python3 beeper/oauth_setup.py "read write"`. It prints an
    `AUTH_URL` and waits for a redirect to a local callback — open the
@@ -132,6 +160,12 @@ reporting, persistence) that the phases below assume.
    `POST /v1/chats/<chatID>/messages` with
    `{"attachment": {"uploadID": ...}}`; send cover text as a separate
    message and verify by reading the thread back.
+7. Link the owner's messaging account(s) in Beeper (e.g. WhatsApp):
+   in Beeper's settings, add the account and complete its link flow.
+   The link needs a QR code shown on a screen the owner's phone can
+   scan — which the phone itself cannot be — or a pairing code, so
+   schedule this inside the live sitting with a second screen at
+   hand. Verify by exchanging a real message in the support channel.
 - **Verify**: `curl -H "Authorization: Bearer <token>"
   http://127.0.0.1:23373/v1/accounts` returns 200 and your accounts;
   a chat search finds a known conversation. Restart Beeper — kill it
@@ -140,6 +174,27 @@ reporting, persistence) that the phases below assume.
   run the launch script — and confirm the API comes back. The
   launcher alone exits 0 without restarting when Beeper is already
   running.
+
+### Credential and code hand-over (all phases)
+
+Rules elsewhere in this package say "no credentials in chat, ever".
+Read literally, that makes several required steps impossible — the
+owner's only channel to the agent IS chat. The actual rule:
+
+- Never in a group or supervisor channel. Never to another agent.
+  Never in the records repo or any file that syncs.
+- To the owner's own agent, in their private 1:1 chat, an item may
+  pass only when the agent has asked for that specific item (an API
+  password, a one-time code with no direct-entry route). The agent
+  writes it straight to a 600-permission file or its credential
+  store, confirms receipt by key name only (never echoing the
+  value), and the owner deletes the message afterwards.
+- Prefer routes where the owner types the secret into the service's
+  own screen (secure entry forms, pairing codes) whenever one
+  exists; the chat route is the fallback, not the default.
+- Time-limited flows (QR codes, timed consents, expiring links) are
+  opened only while the owner is present in a scheduled sitting —
+  never asynchronously, or the agent will re-ask and spam.
 
 ## Phase 4 — healthchecks.io (dead man's switch)
 
@@ -151,6 +206,9 @@ reporting, persistence) that the phases below assume.
    mailbox you can read and a browser session — givens for the agent
    platform this package targets.) **[HUMAN]** only if the account already
    belongs to the human and they want to tap anything themselves.
+   (Minimal profile: the author may host the check in their own
+   healthchecks account and hand over only the ping URL — the alerts
+   then land where the support actually happens.)
 2. Add a check: cron schedule matching your health loop (e.g.
    `*/30 * * * *`), grace 15 min, email notifications on.
 3. Store the ping URL **and a read-only API key** in
@@ -206,14 +264,11 @@ reporting, persistence) that the phases below assume.
    first tick — in field use, a morning reboot went unrepaired for
    hours because nothing ran the loop at boot.
 - **Verify**: kill Beeper, run one loop iteration, watch the loop
-  relaunch it and end green. Then run the **restart drill**
-  (`durability/RESTART-SURVIVAL.md`): restart the VM — or delete one
-  restored item per class — hands off, and let one loop cycle restore
-  everything; confirm the boot trigger fired on the restart (the
-  restore already in progress or done before the first scheduled
-  tick), and finish by confirming in the channel that you can still
-  state your approval boundaries and supervisor arrangements from
-  your own rules files. The setup is not done until the drill passes.
+  relaunch it and end green. Then run the **restore spot-check**:
+  delete one restored item per class (a unit file, a package, a
+  mirror) and let one loop cycle restore it. The full restart drill
+  runs at the very end (see *Final verification*) — asked earlier,
+  it would demand proof of things Phases 6–8 have not installed yet.
 
 ## Phase 6 — Working rules
 
@@ -227,8 +282,10 @@ reporting, persistence) that the phases below assume.
    (payments, bookings, external sends), and what counts as proof of
    completion (a confirmation email / account record / readback —
    never a work summary).
-- **Verify**: the human can state back the approval boundaries in one
-  sentence each. If they can't, the rules are too long.
+- **Verify**: the agent posts the approval boundaries in the owner's
+  language, one sentence each, and the owner confirms or corrects
+  them. If the agent cannot state them that plainly, the rules are
+  too long.
 
 ## Phase 7 — The working systems (todo, skills, workflows)
 
@@ -261,6 +318,50 @@ reporting, persistence) that the phases below assume.
   inbox message into it, and land one change of each kind (a todo
   flip, a doc) through the gates.
 
+## Phase 8 — The flagship task
+
+The setup exists to serve the owner's real work. For an adopter
+whose purpose is one clear task (an athlete's performance data, a
+shop's books), that task is a phase, not an afterthought:
+
+1. Before the live sitting, the author side establishes whether the
+   owner's issued account can use the data source's API at all, and
+   what its terms allow (automated access, storing the data,
+   sharing it). If that needs the issuing organisation's
+   administrator, ask early — the answer can take days. Test
+   read-only endpoints, a handful of attempts, never a retry loop
+   against someone else's account system.
+2. In the sitting: the owner enters the credentials on their own
+   side (see *Credential and code hand-over*); the agent installs
+   the client and runs the smallest real query.
+3. The agent produces ONE small real output from the owner's data
+   and reviews it with the owner in their language — sanity-checking
+   units, labels and known values against what the owner already
+   knows.
+4. If API access is refused or absent, fall back the same week:
+   export (e.g. CSV) from the service's own UI into the owner's
+   drive, and analyse that. "Your account cannot use the API" must
+   never be the setup's only visible outcome.
+- **Verify**: the owner has seen one real output and confirmed it
+  matches their data.
+
+## Final verification (after Phase 6, and Phases 7–8 where taken)
+
+Run the full **restart drill** (`durability/RESTART-SURVIVAL.md`)
+only now: restart the VM — or delete one restored item per class —
+hands off, let one loop cycle restore everything, confirm the boot
+trigger fired (the restore already in progress or done before the
+first scheduled tick). Two scope notes:
+
+- A reboot proves the boot trigger and the restore list. A VM
+  *replacement* additionally proves the job registrations
+  themselves survived; record which of the two you actually tested.
+- The owner's part is small and in their language: the agent posts
+  its approval boundaries and supervisor arrangements as a short
+  plain-language summary (about three sentences), and the owner
+  replies yes or corrects it. Do not ask a beginner to recite rules
+  back from memory.
+
 ## Guided onboarding (when the adopter is a beginner)
 
 A runbook alone assumes an operator who already thinks this way. If
@@ -284,6 +385,9 @@ guided, not self-serve:
 Report to the human: what is up, what you verified (with the actual
 check outputs behind each claim), which human steps remain, and the
 one-line status of each phase — started / running / done, exactly.
+Where the adopter has a flagship task, "done" also requires its
+first real output to have been shown to the owner (Phase 8) and the
+final verification above to have passed.
 
 **Operating posture from day one**: you are in a value-proving phase.
 Under the AGENTS.md core rules (rule 8), build and show reversible
