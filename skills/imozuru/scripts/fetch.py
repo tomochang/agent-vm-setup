@@ -34,6 +34,7 @@ import tempfile
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
+import zlib
 from html.parser import HTMLParser
 from pathlib import Path
 from xml.parsers import expat
@@ -283,7 +284,31 @@ def download(url: str, user_agent: str = BROWSER_UA) -> tuple[bytes, str]:
             raise ValueError(f"本体が {MAX_BYTES:,} バイトを超える")
         if isinstance(res.length, int) and res.length > 0:
             raise ValueError("本体が途中で切れた")
+        # 頼まなくても gzip で返すサーバがある（DeepMind のブログ。watch.py の
+        # fetch_final は同じ理由で展開している）。圧縮されたバイト列は短いので
+        # 上の長さ検査を通り、文字化けした原文が OK として残ってしまう。
+        if res.headers.get("Content-Encoding", "").strip().lower() in {"gzip", "x-gzip"}:
+            body = gunzip(body)
         return body, res.headers.get("Content-Type", "")
+
+
+def gunzip(data: bytes) -> bytes:
+    """gzip を展開する。展開した後の合計にも MAX_BYTES の上限を置き、途中で切れた gzip は断る。
+
+    小さな gzip が何 GB にも膨らむ爆弾で、メモリを使い切らないようにする。gzip は複数のかたまりを
+    つないでよいので、残り（unused_data）が無くなるまで続けて展開する（watch.py の gunzip と同一。
+    2026-10-20 の2回目のレビュー）。
+    """
+    out = b""
+    while data:
+        inflater = zlib.decompressobj(16 + zlib.MAX_WBITS)
+        out += inflater.decompress(data, MAX_BYTES + 1 - len(out))
+        if len(out) > MAX_BYTES or inflater.unconsumed_tail:
+            raise ValueError(f"展開した本体が {MAX_BYTES:,} バイトを超える")
+        if not inflater.eof:
+            raise ValueError("gzip が途中で切れた")
+        data = inflater.unused_data.lstrip(b"\0")  # 後ろの0の詰め物は、標準の gzip と同じく読み飛ばす
+    return out
 
 
 def pdf_save(url: str, out: Path) -> bool:
