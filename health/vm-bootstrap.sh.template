@@ -49,4 +49,14 @@ fi
 # 4. locales (optional — only if your tooling depends on a specific one)
 # locale-gen en_US.UTF-8 2>/dev/null || true
 
+# 5. system tools on the restore list. Declare every tool installed
+# outside $HOME here, in the same change that installs it (see
+# durability/RESTART-SURVIVAL.md). Check-then-install, idempotent:
+#   ensure_tool() { command -v "$1" >/dev/null 2>&1 || { log "restoring $1"; <install command> || FAIL=1; }; }
+#   ensure_tool ruby        # e.g. apt-get install -y ruby
+#   ensure_tool <tool>
+# Service units are restored the same way: keep the unit files in
+# $HOME, copy them into /etc/systemd/system here, daemon-reload and
+# enable. A unit that exists only in /etc is a unit that will vanish.
+
 exit $FAIL

@@ -10,6 +10,11 @@ Conventions: `$RECORDS` = your private records repo (Phase 1).
 Credentials live only in 600-permission files under `~/.config/` or in
 gitignored `credentials/` inside `$RECORDS`. Never print a secret value.
 
+**Owner start**: the human begins by pasting the prompt in
+`KICKOFF.md` to you. If you are reading this without having received
+it, ask for it once — it carries standing instructions (posture,
+reporting, persistence) that the phases below assume.
+
 ## Phase 0 — Environment survey
 
 - These VMs are single-tenant agent boxes: the setup and the health
@@ -23,7 +28,10 @@ gitignored `credentials/` inside `$RECORDS`. Never print a secret value.
 - Check whether your home survives VM replacement. Anything installed
   under `/usr` or `/root` may be wiped on hosted VMs — prefer `$HOME`
   installs (e.g. an npm prefix inside `$HOME`) and plan to re-restore
-  the rest from the bootstrap script (Phase 5).
+  the rest from the bootstrap script (Phase 5). The survival model
+  behind this — what dies, what the bootstrap must restore, and the
+  drill that proves it — is `durability/RESTART-SURVIVAL.md`; read
+  it before Phase 5.
 - If the VM reaches the internet through a proxy whose credentials
   rotate per session, find out whether it accepts credential-free
   CONNECT. Long-lived processes (Beeper) must not capture a
@@ -165,8 +173,14 @@ gitignored `credentials/` inside `$RECORDS`. Never print a secret value.
    The check only reports; it never fixes.
 2. Adapt `health/vm-bootstrap.sh.template`: idempotently restore
    everything a VM replacement wipes (mirrors into volatile paths,
-   app relaunches including Beeper, locales, temp dirs). Single
+   app relaunches including Beeper, system tools installed outside
+   `$HOME` — language runtimes and CLIs your gates depend on —
+   reinstalled service units, locales, temp dirs). Single
    instance (flock). It is called *by* the loop, never by hand-waving.
+   Every tool any earlier phase installed outside `$HOME` goes on the
+   bootstrap's restore list in the same change; an install that is
+   not on the list is scheduled amnesia
+   (`durability/RESTART-SURVIVAL.md`).
 3. Schedule a 30-minute job running `health/health-loop.sh.template`
    (adapted): ping (Phase 4) → check → bootstrap once → recheck →
    surface remaining failures to the human, stay silent when all
@@ -184,8 +198,12 @@ gitignored `credentials/` inside `$RECORDS`. Never print a secret value.
    and `git pull --no-rebase --no-edit` as separate steps; silent
    unless the tree is dirty or a pull conflicts.
 - **Verify**: kill Beeper, run one loop iteration, watch the loop
-  relaunch it and end green. Simulate a VM wipe of one restored item
-  if your platform allows it.
+  relaunch it and end green. Then run the **restart drill**
+  (`durability/RESTART-SURVIVAL.md`): restart the VM — or delete one
+  restored item per class — hands off, and let one loop cycle restore
+  everything; finish by confirming in the channel that you can still
+  state your approval boundaries and supervisor arrangements from
+  your own rules files. The setup is not done until the drill passes.
 
 ## Phase 6 — Working rules
 
