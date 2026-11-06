@@ -1,0 +1,29 @@
+# agent-boot.service — run the health loop once at boot.
+#
+# Why: the health loop's ~30-minute cadence leaves a rebooted VM
+# unrestored until the first tick after the boot. This oneshot closes
+# that gap: recovery starts at boot, not at the next tick.
+#
+# The unit file itself lives in the wipe zone (/etc/systemd/system):
+# keep the canonical copy in $HOME / the records repo and let
+# vm-bootstrap reinstall and enable it like every other restore-list
+# item (durability/RESTART-SURVIVAL.md). After a full VM replacement
+# the registration may be gone too — the scheduled loop and the dead
+# man's switch are the backstop for that case.
+#
+# Adapt: <AGENT_USER>, and the path of your adapted health-loop.sh.
+# Non-systemd platforms: a cron "@reboot" line running the same
+# script, or a platform startup job, is the equivalent shape.
+
+[Unit]
+Description=Agent health loop (boot run)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=<AGENT_USER>
+ExecStart=/bin/bash <HOME>/health/health-loop.sh
+
+[Install]
+WantedBy=multi-user.target
