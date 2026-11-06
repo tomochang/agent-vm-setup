@@ -6,7 +6,9 @@ agent and an independent reviewer, all reading the same messaging inbox.
 
 Built from a working system (in daily use since January 2026) and packaged
 so that **a Muse can set it up almost non-stop**: follow
-[SETUP.md](SETUP.md) top to bottom. The only stops are the sign-in steps
+[SETUP.md](SETUP.md) top to bottom. The human starts by pasting the
+[KICKOFF.md](KICKOFF.md) prompt to the setting-up agent — it carries
+the standing instructions the runbook assumes. The only stops are the sign-in steps
 that are human by design (passkeys, OAuth consent, Beeper's device
 verification) — everything else is scripted or scriptable.
 
@@ -29,6 +31,12 @@ Supporting mechanisms (in `health/` and `templates/`):
 - **Failure ledger** — every failure is logged with a signature; a second
   occurrence of the same signature must become a mechanism (a check, a
   rule, a script), never just a fix in place.
+- **Restart survival** — VM replacements wipe everything outside the
+  home directory, and an agent that loses its tools and rules that way
+  reads from outside as "gone silent". The model — home-only
+  originals, a declared bootstrap restore list, and a restart drill
+  that must pass before the setup counts as done — is
+  [durability/RESTART-SURVIVAL.md](durability/RESTART-SURVIVAL.md).
 - **Gates** — external writes (pushes, sends, payments) go through
   explicit approval gates, not agent improvisation.
 - **Coordination protocol** — when two agents serve the same human, they
