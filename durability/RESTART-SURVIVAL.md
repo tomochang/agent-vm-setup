@@ -55,6 +55,15 @@ Worst case, a replacement costs one loop interval of degraded
 service — not a day of unexplained silence. The dead man's switch
 covers the worse case where the loop itself never comes back.
 
+**Close the boot gap.** A 30-minute loop still leaves a rebooted VM
+unrestored until the first tick, and a reboot just after a tick
+leaves nearly a full interval. Register the same loop script as a
+boot job (a oneshot service, an `@reboot` cron line, or a platform
+startup job) so recovery starts at boot. After a full VM
+*replacement* the boot job's own registration may be wiped too; the
+loop and the dead man's switch backstop that case, and the bootstrap
+reinstalls the boot job like everything else on the restore list.
+
 ## The restart drill (required before "setup done")
 
 A setup that has never survived a restart is unproven in exactly the
@@ -65,8 +74,9 @@ dimension that will fail first. Before reporting the setup complete:
    mirror, one service unit, and kill the inbox app).
 2. Do not repair anything by hand. Let one health-loop cycle run.
 3. Prove, with check output: bootstrap-check is green; the inbox app
-   answers its API; watchers are running; scheduled jobs are
-   registered.
+   answers its API and returns chats; watchers are running; scheduled
+   jobs are registered; and the boot trigger's run is visible in the
+   log before the first scheduled tick would have fired.
 4. Prove the agent came back *as itself*: ask it in its channel to
    state its approval boundaries and, if it has them, its supervisor
    arrangements. The correct text means its rules files loaded; a
@@ -84,6 +94,11 @@ replacement is measured against it.
   simply gone. When an agent suddenly goes quiet or cautious after
   any infrastructure event, check the restore list first, behavior
   second.
+- An application can be up and useless: process alive, API
+  answering, account signed out, inbox empty. A check that stops at
+  "API 200" certifies a corpse. Every app invariant must end at data
+  actually flowing — a list call that returns real items (the
+  bootstrap-check template's Beeper lines show the shape).
 - Package mirrors can be the bottleneck of a restore: a full package
   index refresh on a slow mirror has taken ~10 minutes while a
   single fast mirror finished in well under one. If your platform's

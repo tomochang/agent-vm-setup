@@ -1,6 +1,8 @@
 #!/bin/bash
 # health-loop.sh — one iteration of the health loop (SETUP Phase 5).
-# Schedule it every ~30 min with your platform's job mechanism.
+# Schedule it every ~30 min with your platform's job mechanism, AND
+# register the same script as a boot job (SETUP Phase 5, step 6): the
+# cadence alone leaves a rebooted VM unrestored until the first tick.
 # Contract: silent when everything is green; anything printed is a
 # message to the human. Ping goes FIRST and unconditionally — a loop
 # that dies before pinging is exactly what the switch watches for.
