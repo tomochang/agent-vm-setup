@@ -22,31 +22,37 @@ if command -v gh >/dev/null 2>&1; then
 fi
 if [ -f "$HOME/.ssh/config" ]; then ok "ssh config: present"; else bad "ssh config: MISSING"; fi
 
-# --- Beeper: process up AND Desktop API answering with the stored token ---
-# The token is read inside python, never placed on a command line
-# (argv is world-readable via /proc).
+# --- Beeper: process up, Desktop API answering, AND signed in ---
+# An app can be up and useless: process alive, API answering, account
+# signed out, inbox empty. The check therefore asks for the chat list
+# and requires at least one chat back — data flowing, not a corpse
+# answering. The token is read inside python, never placed on a
+# command line (argv is world-readable via /proc).
 BEEPER_TOKEN_FILE="$RECORDS/credentials/beeper-token"   # adapt path
-beeper_code() {
+beeper_chats() {
   python3 - "$BEEPER_TOKEN_FILE" << 'PYEOF'
-import sys, urllib.request
+import sys, json, urllib.request
 tok = open(sys.argv[1]).read().strip()
-req = urllib.request.Request("http://127.0.0.1:23373/v1/accounts",
+req = urllib.request.Request("http://127.0.0.1:23373/v1/chats?limit=1",
                              headers={"Authorization": "Bearer " + tok})
 try:
     with urllib.request.urlopen(req, timeout=5) as r:
-        print(r.status)
+        d = json.load(r)
+        print("200:%d" % len(d.get("items", [])))
 except Exception as e:
-    print(getattr(e, "code", "ERR"))
+    print(str(getattr(e, "code", "ERR")) + ":0")
 PYEOF
 }
 if ! pgrep -f '[b]eepertexts' >/dev/null 2>&1; then
   bad "beeper: process not running (run vm-bootstrap)"
 elif [ ! -f "$BEEPER_TOKEN_FILE" ]; then
   bad "beeper: API token file missing — run beeper/oauth_setup.py"
-elif [ "$(beeper_code)" = "200" ]; then
-  ok "beeper: process up, Desktop API answers 200 (read/send path works)"
 else
-  bad "beeper: Desktop API did not answer 200 (token expired? re-run beeper/oauth_setup.py)"
+  case "$(beeper_chats)" in
+    "200:0") bad "beeper: API answers but returns no chats — app is signed out (human re-sign-in needed)" ;;
+    200:*)   ok "beeper: process up, API answers, chats return (signed in)" ;;
+    *)       bad "beeper: Desktop API did not answer 200 (token expired? re-run beeper/oauth_setup.py)" ;;
+  esac
 fi
 
 # --- records repo present and clean-ish ---

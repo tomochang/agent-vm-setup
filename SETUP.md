@@ -197,11 +197,21 @@ reporting, persistence) that the phases below assume.
 5. Add an auto-pull job (~30 min) for the records repo: `git fetch`
    and `git pull --no-rebase --no-edit` as separate steps; silent
    unless the tree is dirty or a pull conflicts.
+6. Register a **boot trigger**: the same health-loop script, run once
+   at startup. systemd: adapt `health/agent-boot.service.template`
+   (its unit file is kept in `$HOME` and reinstalled by the bootstrap
+   like every other restore-list item); cron: an `@reboot` line;
+   platform jobs: a startup-triggered job if one is offered. The
+   30-minute cadence alone leaves a rebooted VM unrestored until the
+   first tick — in field use, a morning reboot went unrepaired for
+   hours because nothing ran the loop at boot.
 - **Verify**: kill Beeper, run one loop iteration, watch the loop
   relaunch it and end green. Then run the **restart drill**
   (`durability/RESTART-SURVIVAL.md`): restart the VM — or delete one
   restored item per class — hands off, and let one loop cycle restore
-  everything; finish by confirming in the channel that you can still
+  everything; confirm the boot trigger fired on the restart (the
+  restore already in progress or done before the first scheduled
+  tick), and finish by confirming in the channel that you can still
   state your approval boundaries and supervisor arrangements from
   your own rules files. The setup is not done until the drill passes.
 
